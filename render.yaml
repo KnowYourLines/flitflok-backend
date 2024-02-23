@@ -6,7 +6,7 @@ services:
     region: ohio
     plan: free
     branch: main
-    dockerCommand: bash -c 'python manage.py makemigrations api'
+    dockerCommand: ./deploy.sh
     envVars:
       - key: PORT
         value: 8000
