@@ -14,8 +14,6 @@ services:
         value: 3.10.8
       - key: DEBUG
         value: False
-      - key: LOCAL
-        value: False
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
