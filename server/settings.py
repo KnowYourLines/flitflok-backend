@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.gis",
     "corsheaders",
     "rest_framework",
     "api",
@@ -85,7 +86,9 @@ WSGI_APPLICATION = "server.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {"default": dj_database_url.config(conn_max_age=600)}
+db_config = dj_database_url.config(conn_max_age=600)
+db_config["ENGINE"] = "django.contrib.gis.db.backends.postgis"
+DATABASES = {"default": db_config}
 
 
 # Password validation
