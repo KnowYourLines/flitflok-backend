@@ -9,15 +9,15 @@ docker-compose down --rmi all
 ```
 To run functional tests:
 ```
-docker exec -it varyfly-backend-web-1 python manage.py test functional_tests
+docker exec -it flitflok-backend-web-1 python manage.py test functional_tests
 ```
 To run unit tests:
 ```
-docker exec -it varyfly-backend-web-1 python manage.py test api
+docker exec -it flitflok-backend-web-1 python manage.py test api
 ```
 To open a terminal on the running app:
 ```
-docker exec -it varyfly-backend-web-1 bash
+docker exec -it flitflok-backend-web-1 bash
 ```
 # Deploying on Render
 Go to [Render Blueprints](https://dashboard.render.com/blueprints). Connect a Github account with access to this repo and select this repo when creating a new Blueprint instance.
