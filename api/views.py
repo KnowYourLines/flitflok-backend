@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import EulaAgreedSerializer, UserSerializer
+from api.serializers import UserSerializer
 
 
 class EulaAgreedView(APIView):
@@ -12,7 +12,7 @@ class EulaAgreedView(APIView):
         return Response(output)
 
     def patch(self, request):
-        serializer = EulaAgreedSerializer(
+        serializer = UserSerializer(
             request.user,
             data=request.data,
         )
