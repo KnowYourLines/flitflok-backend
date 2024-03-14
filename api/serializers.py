@@ -17,6 +17,3 @@ class VideoSerializer(GeoFeatureModelSerializer):
         model = Video
         geo_field = "location"
         fields = ("creator", "place_name", "address", "file_id")
-
-    def create(self, validated_data):
-        return Video(**validated_data)
