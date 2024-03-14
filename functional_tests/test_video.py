@@ -41,3 +41,17 @@ class VideoTest(APITestCase):
         assert saved_video.location.y == 51.51291201050047
         assert saved_video.place_name == "hello"
         assert saved_video.address == "world"
+
+    def test_requires_file_and_location_only(self):
+        user = User.objects.create(username="hello world")
+        video_id = uuid.uuid4()
+        self.client.force_authenticate(user=user)
+        response = self.client.post(
+            "/video/",
+            {},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert set(response.data) == {"file_id", "location"}
+        assert response.data["file_id"][0] == "This field is required."
+        assert response.data["location"][0] == "This field is required."
