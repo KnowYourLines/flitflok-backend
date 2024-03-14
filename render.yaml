@@ -32,8 +32,6 @@ services:
         sync: false
       - key: FIREBASE_CLIENT_CERT_URL
         sync: false
-      - key: MAPS_API_KEY
-        sync: false
 
 databases:
   - name: flitflok-db
