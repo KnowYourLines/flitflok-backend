@@ -10,7 +10,7 @@ class EulaAgreedTest(APITestCase):
         self.client.force_authenticate(user=user)
         response = self.client.get("/eula-agreed/")
         assert response.status_code == HTTPStatus.OK
-        assert not response.data["agreed_to_eula"]
+        assert response.data == {"agreed_to_eula": False}
 
     def test_updates_eula_agreed(self):
         user = User.objects.create()
@@ -19,13 +19,13 @@ class EulaAgreedTest(APITestCase):
             "/eula-agreed/", {"agreed_to_eula": True}, format="json"
         )
         assert response.status_code == HTTPStatus.OK
-        assert response.data["agreed_to_eula"]
+        assert response.data == {"agreed_to_eula": True}
         user = User.objects.get(pk=user.pk)
         assert user.agreed_to_eula
         response = self.client.patch(
             "/eula-agreed/", {"agreed_to_eula": False}, format="json"
         )
         assert response.status_code == HTTPStatus.OK
-        assert not response.data["agreed_to_eula"]
+        assert response.data == {"agreed_to_eula": False}
         user = User.objects.get(pk=user.pk)
         assert not user.agreed_to_eula
