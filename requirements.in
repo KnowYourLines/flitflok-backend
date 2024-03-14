@@ -1,5 +1,6 @@
 Django<5
 djangorestframework<4
+djangorestframework-gis
 psycopg2>=2.8
 dj-database-url
 whitenoise[brotli]
