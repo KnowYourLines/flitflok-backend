@@ -24,6 +24,11 @@ class VideoQueryParamSerializer(serializers.Serializer):
     longitude = serializers.FloatField()
     current_video = serializers.UUIDField(required=False)
 
+    def validate_current_video(self, value):
+        if not Video.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Current video does not exist")
+        return value
+
 
 class VideoResultsSerializer(GeoFeatureModelSerializer):
     distance = serializers.SerializerMethodField()
@@ -46,3 +51,6 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
 
     def get_distance(self, obj):
         return obj.distance.km
+
+    def get_ranking(self, obj):
+        return obj.ranking

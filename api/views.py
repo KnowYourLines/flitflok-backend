@@ -60,6 +60,13 @@ class VideoView(APIView):
             .annotate(epoch_timestamp=Extract("created_at", "epoch"))
             .annotate(ranking=F("epoch_timestamp") / (1 + F("distance")))
             .annotate(posted_at=TruncMinute("created_at"))
-        ).order_by("-ranking")[:2]
+        ).order_by("-ranking")
+        if current_video := params.validated_data.get("current_video"):
+            current_index = next(
+                index for index, video in enumerate(videos) if video.id == current_video
+            )
+            videos = videos[current_index + 1 : current_index + 3]
+        else:
+            videos = videos[:2]
         results = VideoResultsSerializer(videos, many=True)
         return Response(results.data, status=status.HTTP_200_OK)
