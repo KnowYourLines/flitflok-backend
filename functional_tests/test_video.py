@@ -77,6 +77,7 @@ class VideoTest(APITestCase):
                 format="json",
             )
             assert response.status_code == HTTPStatus.CREATED
+        with freeze_time("2022-01-14"):
             second_most_recent_video_id = uuid.uuid4()
             response = self.client.post(
                 "/video/",
@@ -92,6 +93,7 @@ class VideoTest(APITestCase):
                 format="json",
             )
             assert response.status_code == HTTPStatus.CREATED
+        with freeze_time("2022-01-14"):
             latest_video_id = uuid.uuid4()
             response = self.client.post(
                 "/video/",
@@ -101,7 +103,7 @@ class VideoTest(APITestCase):
                     "address": "world",
                     "location": {
                         "type": "Point",
-                        "coordinates": [0, 51.51291201050047],
+                        "coordinates": [-0.033387, 51.51291201050047],
                     },
                 },
                 format="json",
@@ -109,46 +111,46 @@ class VideoTest(APITestCase):
             assert response.status_code == HTTPStatus.CREATED
             current_latitude = 51.51291201050047
             current_longitude = -0.0333876462451904
-            response = self.client.get(
-                f"/video/?latitude={current_latitude}&longitude={current_longitude}"
-            )
-            assert response.status_code == HTTPStatus.OK
-            assert response.data == {
-                "type": "FeatureCollection",
-                "features": [
-                    {
-                        "id": str(Video.objects.get(file_id=most_recent_video_id).id),
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [-0.03338764624519, 51.51291201050047],
-                        },
-                        "properties": {
-                            "place_name": "hello",
-                            "address": "world",
-                            "file_id": str(most_recent_video_id),
-                            "distance": 0.0,
-                            "posted_at": datetime.datetime(
-                                2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
-                            ),
-                        },
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.data == {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=latest_video_id).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.033387, 51.51291201050047],
                     },
-                    {
-                        "type": "Feature",
-                        "id": str(Video.objects.get(file_id=latest_video_id).id),
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [0.0, 51.51291201050047],
-                        },
-                        "properties": {
-                            "place_name": "hello",
-                            "address": "world",
-                            "file_id": str(latest_video_id),
-                            "distance": 2.3178001882955614,
-                            "posted_at": datetime.datetime(
-                                2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
-                            ),
-                        },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": str(latest_video_id),
+                        "distance": 4.4862918037199874e-05,
+                        "posted_at": datetime.datetime(
+                            2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ),
                     },
-                ],
-            }
+                },
+                {
+                    "id": str(Video.objects.get(file_id=most_recent_video_id).id),
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.03338764624519, 51.51291201050047],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": str(most_recent_video_id),
+                        "distance": 0.0,
+                        "posted_at": datetime.datetime(
+                            2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ),
+                    },
+                },
+            ],
+        }
