@@ -266,3 +266,17 @@ class VideoTest(APITestCase):
             "type": "FeatureCollection",
             "features": [],
         }
+
+    def test_current_video_must_be_valid(self):
+        current_latitude = 51.51291201050047
+        current_longitude = -0.0333876462451904
+        user = User.objects.create(username="hello world")
+        current_video = uuid.uuid4()
+        self.client.force_authenticate(user=user)
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+            f"&current_video={current_video}"
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert set(response.data) == {"current_video"}
+        assert response.data["current_video"][0] == "Current video does not exist"
