@@ -1,9 +1,19 @@
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
+from django.db.models import F
+from django.db.models.functions import Extract, TruncMinute
 from firebase_admin.auth import delete_user
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import UserSerializer, VideoSerializer
+from api.models import Video
+from api.serializers import (
+    UserSerializer,
+    VideoSerializer,
+    VideoQueryParamSerializer,
+    VideoResultsSerializer,
+)
 
 
 class EulaAgreedView(APIView):
@@ -36,3 +46,20 @@ class VideoView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def get(self, request):
+        params = VideoQueryParamSerializer(data=request.query_params)
+        params.is_valid(raise_exception=True)
+        latitude = params.validated_data["latitude"]
+        longitude = params.validated_data["longitude"]
+        current_location = Point(longitude, latitude, srid=4326)
+        videos = (
+            Video.objects.annotate(
+                distance=Distance("location", current_location, spheroid=True)
+            )
+            .annotate(epoch_timestamp=Extract("created_at", "epoch"))
+            .annotate(ranking=F("epoch_timestamp") / (1 + F("distance")))
+            .annotate(posted_at=TruncMinute("created_at"))
+        ).order_by("-ranking")[:2]
+        results = VideoResultsSerializer(videos, many=True)
+        return Response(results.data, status=status.HTTP_200_OK)

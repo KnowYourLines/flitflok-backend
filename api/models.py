@@ -15,4 +15,4 @@ class Video(models.Model):
     place_name = models.TextField(blank=True)
     address = models.TextField(blank=True)
     location = models.PointField()
-    file_id = models.UUIDField()
+    file_id = models.UUIDField(unique=True)

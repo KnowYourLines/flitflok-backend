@@ -17,3 +17,32 @@ class VideoSerializer(GeoFeatureModelSerializer):
         model = Video
         geo_field = "location"
         fields = ("creator", "place_name", "address", "file_id")
+
+
+class VideoQueryParamSerializer(serializers.Serializer):
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    current_video = serializers.UUIDField(required=False)
+
+
+class VideoResultsSerializer(GeoFeatureModelSerializer):
+    distance = serializers.SerializerMethodField()
+    posted_at = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Video
+        geo_field = "location"
+        fields = (
+            "id",
+            "place_name",
+            "address",
+            "file_id",
+            "distance",
+            "posted_at",
+        )
+
+    def get_posted_at(self, obj):
+        return obj.posted_at
+
+    def get_distance(self, obj):
+        return obj.distance.km
