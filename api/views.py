@@ -1,7 +1,6 @@
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
-from django.db.models import F
-from django.db.models.functions import Extract, TruncMinute
+from django.db.models.functions import TruncMinute
 from firebase_admin.auth import delete_user
 from rest_framework import status
 from rest_framework.response import Response
@@ -56,11 +55,8 @@ class VideoView(APIView):
         videos = (
             Video.objects.annotate(
                 distance=Distance("location", current_location, spheroid=True)
-            )
-            .annotate(epoch_timestamp=Extract("created_at", "epoch"))
-            .annotate(ranking=F("epoch_timestamp") / (1 + F("distance")))
-            .annotate(posted_at=TruncMinute("created_at"))
-        ).order_by("-ranking")
+            ).annotate(posted_at=TruncMinute("created_at"))
+        ).order_by("distance", "-created_at")
         if current_video := params.validated_data.get("current_video"):
             current_index = next(
                 index for index, video in enumerate(videos) if video.id == current_video

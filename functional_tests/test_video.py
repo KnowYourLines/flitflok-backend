@@ -135,7 +135,7 @@ class VideoTest(APITestCase):
                     "address": "world",
                     "location": {
                         "type": "Point",
-                        "coordinates": [-0.033387, 51.51291201050047],
+                        "coordinates": [-0.011591, 51.491857],
                     },
                 },
                 format="json",
@@ -151,23 +151,6 @@ class VideoTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "type": "Feature",
-                    "id": str(Video.objects.get(file_id=latest_video_id).id),
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [-0.033387, 51.51291201050047],
-                    },
-                    "properties": {
-                        "place_name": "hello",
-                        "address": "world",
-                        "file_id": str(latest_video_id),
-                        "distance": 4.4862918037199874e-05,
-                        "posted_at": datetime.datetime(
-                            2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
-                        ),
-                    },
-                },
-                {
                     "id": str(Video.objects.get(file_id=most_recent_video_id).id),
                     "type": "Feature",
                     "geometry": {
@@ -181,6 +164,23 @@ class VideoTest(APITestCase):
                         "distance": 0.0,
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ),
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=latest_video_id).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": str(latest_video_id),
+                        "distance": 2.788929913358129,
+                        "posted_at": datetime.datetime(
+                            2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ),
                     },
                 },

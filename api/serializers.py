@@ -51,6 +51,3 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
 
     def get_distance(self, obj):
         return obj.distance.km
-
-    def get_ranking(self, obj):
-        return obj.ranking
