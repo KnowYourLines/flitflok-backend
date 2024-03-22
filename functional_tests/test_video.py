@@ -7,6 +7,12 @@ from rest_framework.test import APITestCase
 
 from api.models import User, Video
 
+VALID_FILE_ID = "0888bcb9-c5b1-4587-8ed8-1aed45a04313"
+VALID_FILE_ID_2 = "09991e04-1ef9-4a8e-ac94-8a19faa2de1b"
+VALID_FILE_ID_3 = "0dbc46ba-f87a-4ff0-a737-e0538c70c4ef"
+VALID_FILE_ID_4 = "13d4a295-9949-4d9c-8c46-1d963051e6ec"
+VALID_FILE_ID_5 = "1670388e-3d3d-470b-ad7a-779261fc3017"
+
 
 class VideoTest(APITestCase):
     def test_submits_video(self):
@@ -15,7 +21,7 @@ class VideoTest(APITestCase):
         response = self.client.post(
             "/video/",
             {
-                "file_id": "0888bcb9-c5b1-4587-8ed8-1aed45a04313",
+                "file_id": VALID_FILE_ID,
                 "place_name": "hello",
                 "address": "world",
                 "location": {
@@ -35,10 +41,10 @@ class VideoTest(APITestCase):
             "properties": {
                 "place_name": "hello",
                 "address": "world",
-                "file_id": "0888bcb9-c5b1-4587-8ed8-1aed45a04313",
+                "file_id": VALID_FILE_ID,
             },
         }
-        saved_video = Video.objects.get(file_id="0888bcb9-c5b1-4587-8ed8-1aed45a04313")
+        saved_video = Video.objects.get(file_id=VALID_FILE_ID)
         assert saved_video.location.x == -0.0333876462451904
         assert saved_video.location.y == 51.51291201050047
         assert saved_video.place_name == "hello"
@@ -82,12 +88,11 @@ class VideoTest(APITestCase):
     def test_finds_next_2_videos(self):
         with freeze_time("2012-01-14"):
             user = User.objects.create(username="hello world")
-            most_recent_video_id = uuid.uuid4()
             self.client.force_authenticate(user=user)
             self.client.post(
                 "/video/",
                 {
-                    "file_id": most_recent_video_id,
+                    "file_id": VALID_FILE_ID,
                     "place_name": "hello",
                     "address": "world",
                     "location": {
@@ -98,11 +103,10 @@ class VideoTest(APITestCase):
                 format="json",
             )
         with freeze_time("2022-01-14"):
-            latest_video_id = uuid.uuid4()
             self.client.post(
                 "/video/",
                 {
-                    "file_id": latest_video_id,
+                    "file_id": VALID_FILE_ID_2,
                     "place_name": "hello",
                     "address": "world",
                     "location": {
@@ -122,7 +126,7 @@ class VideoTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(file_id=most_recent_video_id).id),
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID).id),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
@@ -131,7 +135,7 @@ class VideoTest(APITestCase):
                     "properties": {
                         "place_name": "hello",
                         "address": "world",
-                        "file_id": str(most_recent_video_id),
+                        "file_id": VALID_FILE_ID,
                         "distance": 0.0,
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -140,7 +144,7 @@ class VideoTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(file_id=latest_video_id).id),
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_2).id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -148,7 +152,7 @@ class VideoTest(APITestCase):
                     "properties": {
                         "place_name": "hello",
                         "address": "world",
-                        "file_id": str(latest_video_id),
+                        "file_id": VALID_FILE_ID_2,
                         "distance": 2.788929913358129,
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -158,11 +162,10 @@ class VideoTest(APITestCase):
             ],
         }
         with freeze_time("2022-01-14"):
-            second_video_id = uuid.uuid4()
             self.client.post(
                 "/video/",
                 {
-                    "file_id": second_video_id,
+                    "file_id": VALID_FILE_ID_3,
                     "place_name": "hello",
                     "address": "world",
                     "location": {
@@ -173,11 +176,10 @@ class VideoTest(APITestCase):
                 format="json",
             )
         with freeze_time("2022-02-14"):
-            third_video_id = uuid.uuid4()
             self.client.post(
                 "/video/",
                 {
-                    "file_id": third_video_id,
+                    "file_id": VALID_FILE_ID_4,
                     "place_name": "hello",
                     "address": "world",
                     "location": {
@@ -188,11 +190,10 @@ class VideoTest(APITestCase):
                 format="json",
             )
         with freeze_time("2022-01-15"):
-            fourth_video_id = uuid.uuid4()
             self.client.post(
                 "/video/",
                 {
-                    "file_id": fourth_video_id,
+                    "file_id": VALID_FILE_ID_5,
                     "place_name": "hello",
                     "address": "world",
                     "location": {
@@ -212,7 +213,7 @@ class VideoTest(APITestCase):
             "features": [
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(file_id=fourth_video_id).id),
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_5).id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.335827, 53.767750],
@@ -220,7 +221,7 @@ class VideoTest(APITestCase):
                     "properties": {
                         "place_name": "hello",
                         "address": "world",
-                        "file_id": str(fourth_video_id),
+                        "file_id": VALID_FILE_ID_5,
                         "distance": 251.75032594284824,
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
@@ -228,7 +229,7 @@ class VideoTest(APITestCase):
                     },
                 },
                 {
-                    "id": str(Video.objects.get(file_id=second_video_id).id),
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_3).id),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
@@ -237,7 +238,7 @@ class VideoTest(APITestCase):
                     "properties": {
                         "place_name": "hello",
                         "address": "world",
-                        "file_id": str(second_video_id),
+                        "file_id": VALID_FILE_ID_3,
                         "distance": 251.75032594284824,
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -256,7 +257,7 @@ class VideoTest(APITestCase):
             "features": [
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(file_id=third_video_id).id),
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_4).id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-3.188267, 55.953251],
@@ -264,7 +265,7 @@ class VideoTest(APITestCase):
                     "properties": {
                         "place_name": "hello",
                         "address": "world",
-                        "file_id": str(third_video_id),
+                        "file_id": VALID_FILE_ID_4,
                         "distance": 536.136057408564,
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
