@@ -11,12 +11,11 @@ from api.models import User, Video
 class VideoTest(APITestCase):
     def test_submits_video(self):
         user = User.objects.create(username="hello world")
-        video_id = uuid.uuid4()
         self.client.force_authenticate(user=user)
         response = self.client.post(
             "/video/",
             {
-                "file_id": video_id,
+                "file_id": "0888bcb9-c5b1-4587-8ed8-1aed45a04313",
                 "place_name": "hello",
                 "address": "world",
                 "location": {
@@ -36,14 +35,36 @@ class VideoTest(APITestCase):
             "properties": {
                 "place_name": "hello",
                 "address": "world",
-                "file_id": str(video_id),
+                "file_id": "0888bcb9-c5b1-4587-8ed8-1aed45a04313",
             },
         }
-        saved_video = Video.objects.get(file_id=video_id)
+        saved_video = Video.objects.get(file_id="0888bcb9-c5b1-4587-8ed8-1aed45a04313")
         assert saved_video.location.x == -0.0333876462451904
         assert saved_video.location.y == 51.51291201050047
         assert saved_video.place_name == "hello"
         assert saved_video.address == "world"
+
+    def test_submitted_video_file_must_exist(self):
+        user = User.objects.create(username="hello world")
+        self.client.force_authenticate(user=user)
+        video_id = uuid.uuid4()
+        response = self.client.post(
+            "/video/",
+            {
+                "file_id": video_id,
+                "place_name": "hello",
+                "address": "world",
+                "location": {
+                    "type": "Point",
+                    "coordinates": [-0.0333876462451904, 51.51291201050047],
+                },
+            },
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert not Video.objects.filter(file_id=str(video_id))
+        assert set(response.data) == {"file_id"}
+        assert response.data["file_id"][0] == "File does not exist"
 
     def test_requires_file_and_location_only(self):
         user = User.objects.create(username="hello world")

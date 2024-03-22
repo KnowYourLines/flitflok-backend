@@ -24,7 +24,9 @@ cred = credentials.Certificate(
     }
 )
 
-default_app = firebase_admin.initialize_app(cred)
+default_app = firebase_admin.initialize_app(
+    cred, {"storageBucket": f"{os.environ.get('FIREBASE_PROJECT_ID')}.appspot.com"}
+)
 
 
 class FirebaseAuthentication(authentication.BaseAuthentication):

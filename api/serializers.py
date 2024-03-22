@@ -1,3 +1,4 @@
+from firebase_admin import storage
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
@@ -17,6 +18,13 @@ class VideoSerializer(GeoFeatureModelSerializer):
         model = Video
         geo_field = "location"
         fields = ("creator", "place_name", "address", "file_id")
+
+    def validate_file_id(self, value):
+        bucket = storage.bucket()
+        blob = bucket.blob(str(value))
+        if not blob.exists():
+            raise serializers.ValidationError("File does not exist")
+        return value
 
 
 class VideoQueryParamSerializer(serializers.Serializer):
