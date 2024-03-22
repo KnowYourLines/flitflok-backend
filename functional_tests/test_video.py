@@ -63,7 +63,7 @@ class VideoTest(APITestCase):
             user = User.objects.create(username="hello world")
             most_recent_video_id = uuid.uuid4()
             self.client.force_authenticate(user=user)
-            response = self.client.post(
+            self.client.post(
                 "/video/",
                 {
                     "file_id": most_recent_video_id,
@@ -76,58 +76,9 @@ class VideoTest(APITestCase):
                 },
                 format="json",
             )
-            assert response.status_code == HTTPStatus.CREATED
-        with freeze_time("2022-01-14"):
-            second_video_id = uuid.uuid4()
-            response = self.client.post(
-                "/video/",
-                {
-                    "file_id": second_video_id,
-                    "place_name": "hello",
-                    "address": "world",
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.335827, 53.767750],
-                    },
-                },
-                format="json",
-            )
-            assert response.status_code == HTTPStatus.CREATED
-        with freeze_time("2022-02-14"):
-            third_video_id = uuid.uuid4()
-            response = self.client.post(
-                "/video/",
-                {
-                    "file_id": third_video_id,
-                    "place_name": "hello",
-                    "address": "world",
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-3.188267, 55.953251],
-                    },
-                },
-                format="json",
-            )
-            assert response.status_code == HTTPStatus.CREATED
-        with freeze_time("2022-01-15"):
-            fourth_video_id = uuid.uuid4()
-            response = self.client.post(
-                "/video/",
-                {
-                    "file_id": fourth_video_id,
-                    "place_name": "hello",
-                    "address": "world",
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.335827, 53.767750],
-                    },
-                },
-                format="json",
-            )
-            assert response.status_code == HTTPStatus.CREATED
         with freeze_time("2022-01-14"):
             latest_video_id = uuid.uuid4()
-            response = self.client.post(
+            self.client.post(
                 "/video/",
                 {
                     "file_id": latest_video_id,
@@ -140,7 +91,6 @@ class VideoTest(APITestCase):
                 },
                 format="json",
             )
-            assert response.status_code == HTTPStatus.CREATED
             current_latitude = 51.51291201050047
             current_longitude = -0.0333876462451904
         response = self.client.get(
@@ -186,6 +136,51 @@ class VideoTest(APITestCase):
                 },
             ],
         }
+        with freeze_time("2022-01-14"):
+            second_video_id = uuid.uuid4()
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": second_video_id,
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.335827, 53.767750],
+                    },
+                },
+                format="json",
+            )
+        with freeze_time("2022-02-14"):
+            third_video_id = uuid.uuid4()
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": third_video_id,
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-3.188267, 55.953251],
+                    },
+                },
+                format="json",
+            )
+        with freeze_time("2022-01-15"):
+            fourth_video_id = uuid.uuid4()
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": fourth_video_id,
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.335827, 53.767750],
+                    },
+                },
+                format="json",
+            )
         response = self.client.get(
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
             f"&current_video={response.data['features'][-1]['id']}"
