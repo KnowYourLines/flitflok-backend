@@ -326,5 +326,30 @@ class VideoTest(APITestCase):
             format="json",
         )
         assert response.status_code == HTTPStatus.OK
+        assert response.data == {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-0.03338764624519, 51.51291201050047],
+            },
+            "properties": {
+                "place_name": "hello",
+                "address": "world",
+                "file_id": VALID_FILE_ID,
+            },
+        }
         reported_video = Video.objects.get(file_id=VALID_FILE_ID)
         assert reported_video.reported_by.all().first() == user
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+        )
+        assert response.data == {
+            "type": "FeatureCollection",
+            "features": [],
+        }
+        user = User.objects.create(username="goodbye world")
+        self.client.force_authenticate(user=user)
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+        )
+        assert response.data["features"][-1]["id"] == bad_video_id
