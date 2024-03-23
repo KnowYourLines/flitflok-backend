@@ -297,3 +297,34 @@ class VideoTest(APITestCase):
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert set(response.data) == {"current_video"}
         assert response.data["current_video"][0] == "Current video does not exist"
+
+    def test_reports_video(self):
+        user = User.objects.create(username="hello world")
+        self.client.force_authenticate(user=user)
+        self.client.post(
+            "/video/",
+            {
+                "file_id": VALID_FILE_ID,
+                "place_name": "hello",
+                "address": "world",
+                "location": {
+                    "type": "Point",
+                    "coordinates": [-0.0333876462451904, 51.51291201050047],
+                },
+            },
+            format="json",
+        )
+        current_latitude = 51.51291201050047
+        current_longitude = -0.0333876462451904
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+        )
+        bad_video_id = response.data["features"][-1]["id"]
+        response = self.client.patch(
+            f"/video/{bad_video_id}/",
+            {"reported": True},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.OK
+        reported_video = Video.objects.get(file_id=VALID_FILE_ID)
+        assert reported_video.reported_by.all().first() == user

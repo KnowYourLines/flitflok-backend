@@ -27,6 +27,16 @@ class VideoSerializer(GeoFeatureModelSerializer):
         return value
 
 
+class VideoUpdateSerializer(serializers.Serializer):
+    reported = serializers.BooleanField()
+
+    def update(self, instance, validated_data):
+        reporter = self.context["request"].user
+        instance.reported_by.add(reporter)
+        instance.save()
+        return instance
+
+
 class VideoQueryParamSerializer(serializers.Serializer):
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()

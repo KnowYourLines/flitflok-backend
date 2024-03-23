@@ -16,3 +16,5 @@ class Video(models.Model):
     address = models.TextField(blank=True)
     location = models.PointField()
     file_id = models.UUIDField(unique=True)
+    reported_by = models.ManyToManyField(User, related_name="reported_videos")
+    hidden_from = models.ManyToManyField(User, related_name="hidden_videos")

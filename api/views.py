@@ -3,6 +3,7 @@ from django.contrib.gis.geos import Point
 from django.db.models.functions import TruncMinute
 from firebase_admin.auth import delete_user
 from rest_framework import status
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,6 +13,7 @@ from api.serializers import (
     VideoSerializer,
     VideoQueryParamSerializer,
     VideoResultsSerializer,
+    VideoUpdateSerializer,
 )
 
 
@@ -35,6 +37,18 @@ class DeleteAccountView(APIView):
         delete_user(request.user.username)
         request.user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class VideoUpdateView(APIView):
+    def patch(self, request, pk):
+        video = get_object_or_404(Video, pk=pk)
+        serializer = VideoUpdateSerializer(
+            video, data=request.data, partial=True, context={"request": self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        output = VideoSerializer(result)
+        return Response(output.data, status=status.HTTP_200_OK)
 
 
 class VideoView(APIView):
