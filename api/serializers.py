@@ -28,11 +28,26 @@ class VideoSerializer(GeoFeatureModelSerializer):
 
 
 class VideoUpdateSerializer(serializers.Serializer):
-    reported = serializers.BooleanField()
+    reported = serializers.BooleanField(required=False)
+    hidden = serializers.BooleanField(required=False)
+
+    def validate(self, data):
+        if not data.get("reported") and not data.get("hidden"):
+            raise serializers.ValidationError(
+                "Video must be either reported or hidden."
+            )
+        if data.get("reported") and data.get("hidden"):
+            raise serializers.ValidationError(
+                "Video must be either reported or hidden."
+            )
+        return data
 
     def update(self, instance, validated_data):
-        reporter = self.context["request"].user
-        instance.reported_by.add(reporter)
+        user = self.context["request"].user
+        if validated_data.get("reported"):
+            instance.reported_by.add(user)
+        if validated_data.get("hidden"):
+            instance.hidden_from.add(user)
         instance.save()
         return instance
 

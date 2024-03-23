@@ -68,6 +68,7 @@ class VideoView(APIView):
         current_location = Point(longitude, latitude, srid=4326)
         videos = (
             Video.objects.exclude(reported_by=self.request.user)
+            .exclude(hidden_from=self.request.user)
             .annotate(distance=Distance("location", current_location, spheroid=True))
             .annotate(posted_at=TruncMinute("created_at"))
         ).order_by("distance", "-created_at")
