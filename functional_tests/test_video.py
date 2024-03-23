@@ -409,3 +409,46 @@ class VideoTest(APITestCase):
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
         )
         assert response.data["features"][-1]["id"] == bad_video_id
+
+    def test_only_allow_either_hide_or_report(self):
+        user = User.objects.create(username="hello world")
+        self.client.force_authenticate(user=user)
+        self.client.post(
+            "/video/",
+            {
+                "file_id": VALID_FILE_ID,
+                "place_name": "hello",
+                "address": "world",
+                "location": {
+                    "type": "Point",
+                    "coordinates": [-0.0333876462451904, 51.51291201050047],
+                },
+            },
+            format="json",
+        )
+        current_latitude = 51.51291201050047
+        current_longitude = -0.0333876462451904
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+        )
+        bad_video_id = response.data["features"][-1]["id"]
+        response = self.client.patch(
+            f"/video/{bad_video_id}/",
+            {"reported": True, "hidden": True},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert (
+            response.data["non_field_errors"][0]
+            == "Video cannot be both reported and hidden"
+        )
+        response = self.client.patch(
+            f"/video/{bad_video_id}/",
+            {},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert (
+            response.data["non_field_errors"][0]
+            == "Video must be either reported or hidden"
+        )

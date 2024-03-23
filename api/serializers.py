@@ -33,12 +33,10 @@ class VideoUpdateSerializer(serializers.Serializer):
 
     def validate(self, data):
         if not data.get("reported") and not data.get("hidden"):
-            raise serializers.ValidationError(
-                "Video must be either reported or hidden."
-            )
+            raise serializers.ValidationError("Video must be either reported or hidden")
         if data.get("reported") and data.get("hidden"):
             raise serializers.ValidationError(
-                "Video must be either reported or hidden."
+                "Video cannot be both reported and hidden"
             )
         return data
 
