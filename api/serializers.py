@@ -1,3 +1,8 @@
+import os
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from firebase_admin import storage
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
@@ -44,6 +49,19 @@ class VideoUpdateSerializer(serializers.Serializer):
         user = self.context["request"].user
         if validated_data.get("reported"):
             instance.reported_by.add(user)
+            context = {"reported_video_id": str(instance.id)}
+            html_message = render_to_string("reported_video.html", context=context)
+            plain_message = strip_tags(html_message)
+
+            message = EmailMultiAlternatives(
+                subject=f"Video reported",
+                from_email=f"FlitFlok <{os.environ.get('EMAIL_HOST_USER')}>",
+                body=plain_message,
+                to=[os.environ.get("EMAIL_HOST_USER")],
+            )
+
+            message.attach_alternative(html_message, "text/html")
+            message.send()
         if validated_data.get("hidden"):
             instance.hidden_from.add(user)
         instance.save()

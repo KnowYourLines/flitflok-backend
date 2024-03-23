@@ -1,7 +1,10 @@
 import datetime
+import os
 import uuid
 from http import HTTPStatus
 
+from django.core import mail
+from django.test.utils import override_settings
 from freezegun import freeze_time
 from rest_framework.test import APITestCase
 
@@ -14,6 +17,7 @@ VALID_FILE_ID_4 = "13d4a295-9949-4d9c-8c46-1d963051e6ec"
 VALID_FILE_ID_5 = "1670388e-3d3d-470b-ad7a-779261fc3017"
 
 
+# @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
 class VideoTest(APITestCase):
     def test_submits_video(self):
         user = User.objects.create(username="hello world")
@@ -353,6 +357,13 @@ class VideoTest(APITestCase):
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
         )
         assert response.data["features"][-1]["id"] == bad_video_id
+        assert len(mail.outbox) == 1
+        assert mail.outbox[0].subject == "Video reported"
+        assert mail.outbox[0].to == [os.environ.get("EMAIL_HOST_USER")]
+        assert (
+            mail.outbox[0].from_email
+            == f"FlitFlok <{os.environ.get('EMAIL_HOST_USER')}>"
+        )
 
     def test_hides_video(self):
         user = User.objects.create(username="hello world")
