@@ -104,7 +104,7 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
         )
 
     def get_posted_at(self, obj):
-        return obj.posted_at
+        return obj.created_at.timestamp()
 
     def get_distance(self, obj):
         return obj.distance.km

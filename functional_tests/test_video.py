@@ -143,7 +143,7 @@ class VideoTest(APITestCase):
                         "distance": 0.0,
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
-                        ),
+                        ).timestamp(),
                     },
                 },
                 {
@@ -160,7 +160,7 @@ class VideoTest(APITestCase):
                         "distance": 2.788929913358129,
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
-                        ),
+                        ).timestamp(),
                     },
                 },
             ],
@@ -229,7 +229,7 @@ class VideoTest(APITestCase):
                         "distance": 251.75032594284824,
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
-                        ),
+                        ).timestamp(),
                     },
                 },
                 {
@@ -246,7 +246,7 @@ class VideoTest(APITestCase):
                         "distance": 251.75032594284824,
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
-                        ),
+                        ).timestamp(),
                     },
                 },
                 {
@@ -263,7 +263,7 @@ class VideoTest(APITestCase):
                         "distance": 536.136057408564,
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
-                        ),
+                        ).timestamp(),
                     },
                 },
             ],

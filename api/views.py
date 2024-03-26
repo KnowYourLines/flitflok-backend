@@ -98,7 +98,6 @@ class VideoView(APIView):
             .exclude(hidden_from=self.request.user)
             .exclude(creator__in=self.request.user.blocked_users.all())
             .annotate(distance=Distance("location", current_location, spheroid=True))
-            .annotate(posted_at=TruncMinute("created_at"))
         )
         if current_video_id := params.validated_data.get("current_video"):
             current_video = Video.objects.get(id=current_video_id)
