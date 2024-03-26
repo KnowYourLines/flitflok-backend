@@ -431,7 +431,7 @@ class VideoTest(APITestCase):
             f"/video/{bad_video_id}/block/",
             format="json",
         )
-        assert response.status_code == HTTPStatus.NO_CONTENT
+        assert response.status_code == HTTPStatus.OK
         assert response.data == [{"id": video["id"]} for video in videos]
         assert len(Video.objects.filter(creator=bad_user)) == 2
         user = User.objects.get(username=user.username)

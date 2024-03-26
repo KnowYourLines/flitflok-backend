@@ -75,7 +75,7 @@ class VideoBlockView(APIView):
         blocked_videos = VideosBlockedSerializer(
             video.creator.video_set.all().order_by("-created_at"), many=True
         )
-        return Response(blocked_videos.data, status=status.HTTP_204_NO_CONTENT)
+        return Response(blocked_videos.data, status=status.HTTP_200_OK)
 
 
 class VideoView(APIView):
