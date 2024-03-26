@@ -432,7 +432,7 @@ class VideoTest(APITestCase):
             format="json",
         )
         assert response.status_code == HTTPStatus.OK
-        assert response.data == [{"id": video["id"]} for video in videos]
+        assert response.data == [video["id"] for video in videos]
         assert len(Video.objects.filter(creator=bad_user)) == 2
         user = User.objects.get(username=user.username)
         assert user.blocked_users.all().first() == bad_user

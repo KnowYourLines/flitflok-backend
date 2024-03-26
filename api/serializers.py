@@ -114,3 +114,7 @@ class VideosBlockedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
         fields = ("id",)
+
+    def to_representation(self, instance):
+        video = super().to_representation(instance)
+        return video["id"]
