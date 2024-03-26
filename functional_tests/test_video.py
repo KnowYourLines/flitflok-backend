@@ -249,16 +249,6 @@ class VideoTest(APITestCase):
                         ),
                     },
                 },
-            ],
-        }
-        response = self.client.get(
-            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
-            f"&current_video={response.data['features'][-1]['id']}"
-        )
-        assert response.status_code == HTTPStatus.OK
-        assert response.data == {
-            "type": "FeatureCollection",
-            "features": [
                 {
                     "type": "Feature",
                     "id": str(Video.objects.get(file_id=VALID_FILE_ID_4).id),

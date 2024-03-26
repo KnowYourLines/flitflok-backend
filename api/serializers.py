@@ -33,6 +33,15 @@ class VideoSerializer(GeoFeatureModelSerializer):
 
 
 class VideoBlockSerializer(serializers.Serializer):
+    creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    # def validate_file_id(self, value):
+    #     bucket = storage.bucket()
+    #     blob = bucket.blob(str(value))
+    #     if not blob.exists():
+    #         raise serializers.ValidationError("File does not exist")
+    #     return value
+
     def update(self, instance, validated_data):
         user = self.context["request"].user
         user.blocked_users.add(instance.creator)
