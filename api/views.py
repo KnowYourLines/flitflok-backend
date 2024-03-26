@@ -13,7 +13,9 @@ from api.serializers import (
     VideoSerializer,
     VideoQueryParamSerializer,
     VideoResultsSerializer,
-    VideoUpdateSerializer,
+    VideoHideSerializer,
+    VideoReportSerializer,
+    VideoBlockSerializer,
 )
 
 
@@ -39,16 +41,37 @@ class DeleteAccountView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class VideoUpdateView(APIView):
+class VideoReportView(APIView):
     def patch(self, request, pk):
         video = get_object_or_404(Video, pk=pk)
-        serializer = VideoUpdateSerializer(
-            video, data=request.data, partial=True, context={"request": self.request}
+        serializer = VideoReportSerializer(
+            video, data=request.data, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
-        result = serializer.save()
-        output = VideoSerializer(result)
-        return Response(output.data, status=status.HTTP_200_OK)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class VideoHideView(APIView):
+    def patch(self, request, pk):
+        video = get_object_or_404(Video, pk=pk)
+        serializer = VideoHideSerializer(
+            video, data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class VideoBlockView(APIView):
+    def patch(self, request, pk):
+        video = get_object_or_404(Video, pk=pk)
+        serializer = VideoBlockSerializer(
+            video, data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class VideoView(APIView):
@@ -69,6 +92,7 @@ class VideoView(APIView):
         videos = (
             Video.objects.exclude(reported_by=self.request.user)
             .exclude(hidden_from=self.request.user)
+            .exclude(creator__in=self.request.user.blocked_users.all())
             .annotate(distance=Distance("location", current_location, spheroid=True))
             .annotate(posted_at=TruncMinute("created_at"))
         ).order_by("distance", "-created_at")

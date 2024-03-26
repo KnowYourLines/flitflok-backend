@@ -6,6 +6,7 @@ from django.contrib.gis.db import models
 
 class User(AbstractUser):
     agreed_to_eula = models.BooleanField(default=False)
+    blocked_users = models.ManyToManyField("self", blank=True)
 
 
 class Video(models.Model):

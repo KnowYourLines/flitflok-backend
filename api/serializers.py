@@ -32,39 +32,40 @@ class VideoSerializer(GeoFeatureModelSerializer):
         return value
 
 
-class VideoUpdateSerializer(serializers.Serializer):
-    reported = serializers.BooleanField(required=False)
-    hidden = serializers.BooleanField(required=False)
-
-    def validate(self, data):
-        if not data.get("reported") and not data.get("hidden"):
-            raise serializers.ValidationError("Video must be either reported or hidden")
-        if data.get("reported") and data.get("hidden"):
-            raise serializers.ValidationError(
-                "Video cannot be both reported and hidden"
-            )
-        return data
-
+class VideoBlockSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         user = self.context["request"].user
-        if validated_data.get("reported"):
-            instance.reported_by.add(user)
-            context = {"reported_video_id": str(instance.id)}
-            html_message = render_to_string("reported_video.html", context=context)
-            plain_message = strip_tags(html_message)
+        user.blocked_users.add(instance.creator)
+        user.save()
+        return instance
 
-            message = EmailMultiAlternatives(
-                subject=f"Video reported",
-                from_email=f"FlitFlok <{os.environ.get('EMAIL_HOST_USER')}>",
-                body=plain_message,
-                to=[os.environ.get("EMAIL_HOST_USER")],
-            )
 
-            message.attach_alternative(html_message, "text/html")
-            message.send()
-        if validated_data.get("hidden"):
-            instance.hidden_from.add(user)
+class VideoHideSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        user = self.context["request"].user
+        instance.hidden_from.add(user)
         instance.save()
+        return instance
+
+
+class VideoReportSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        user = self.context["request"].user
+        instance.reported_by.add(user)
+        instance.save()
+        context = {"reported_video_id": str(instance.id)}
+        html_message = render_to_string("reported_video.html", context=context)
+        plain_message = strip_tags(html_message)
+
+        message = EmailMultiAlternatives(
+            subject=f"Video reported",
+            from_email=f"FlitFlok <{os.environ.get('EMAIL_HOST_USER')}>",
+            body=plain_message,
+            to=[os.environ.get("EMAIL_HOST_USER")],
+        )
+
+        message.attach_alternative(html_message, "text/html")
+        message.send()
         return instance
 
 

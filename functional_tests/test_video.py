@@ -325,23 +325,11 @@ class VideoTest(APITestCase):
         )
         bad_video_id = response.data["features"][-1]["id"]
         response = self.client.patch(
-            f"/video/{bad_video_id}/",
-            {"reported": True},
+            f"/video/{bad_video_id}/report/",
             format="json",
         )
-        assert response.status_code == HTTPStatus.OK
-        assert response.data == {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [-0.03338764624519, 51.51291201050047],
-            },
-            "properties": {
-                "place_name": "hello",
-                "address": "world",
-                "file_id": VALID_FILE_ID,
-            },
-        }
+        assert response.status_code == HTTPStatus.NO_CONTENT
+        assert not response.data
         reported_video = Video.objects.get(file_id=VALID_FILE_ID)
         assert reported_video.reported_by.all().first() == user
         response = self.client.get(
@@ -388,23 +376,11 @@ class VideoTest(APITestCase):
         )
         bad_video_id = response.data["features"][-1]["id"]
         response = self.client.patch(
-            f"/video/{bad_video_id}/",
-            {"hidden": True},
+            f"/video/{bad_video_id}/hide/",
             format="json",
         )
-        assert response.status_code == HTTPStatus.OK
-        assert response.data == {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [-0.03338764624519, 51.51291201050047],
-            },
-            "properties": {
-                "place_name": "hello",
-                "address": "world",
-                "file_id": VALID_FILE_ID,
-            },
-        }
+        assert response.status_code == HTTPStatus.NO_CONTENT
+        assert not response.data
         reported_video = Video.objects.get(file_id=VALID_FILE_ID)
         assert reported_video.hidden_from.all().first() == user
         response = self.client.get(
@@ -421,45 +397,64 @@ class VideoTest(APITestCase):
         )
         assert response.data["features"][-1]["id"] == bad_video_id
 
-    def test_only_allow_either_hide_or_report(self):
-        user = User.objects.create(username="hello world")
-        self.client.force_authenticate(user=user)
-        self.client.post(
-            "/video/",
-            {
-                "file_id": VALID_FILE_ID,
-                "place_name": "hello",
-                "address": "world",
-                "location": {
-                    "type": "Point",
-                    "coordinates": [-0.0333876462451904, 51.51291201050047],
+    def test_blocks_video_user(self):
+        bad_user = User.objects.create(username="hello world")
+        self.client.force_authenticate(user=bad_user)
+        with freeze_time("2022-01-14"):
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": VALID_FILE_ID,
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.0333876462451904, 51.51291201050047],
+                    },
                 },
-            },
-            format="json",
-        )
+                format="json",
+            )
+        with freeze_time("2022-01-15"):
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": VALID_FILE_ID_2,
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.0333876462451904, 51.51291201050047],
+                    },
+                },
+                format="json",
+            )
         current_latitude = 51.51291201050047
         current_longitude = -0.0333876462451904
+        user = User.objects.create(username="goodbye world")
+        self.client.force_authenticate(user=user)
         response = self.client.get(
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
         )
         bad_video_id = response.data["features"][-1]["id"]
         response = self.client.patch(
-            f"/video/{bad_video_id}/",
-            {"reported": True, "hidden": True},
+            f"/video/{bad_video_id}/block/",
             format="json",
         )
-        assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert (
-            response.data["non_field_errors"][0]
-            == "Video cannot be both reported and hidden"
+        assert response.status_code == HTTPStatus.NO_CONTENT
+        assert not response.data
+        assert len(Video.objects.filter(creator=bad_user)) == 2
+        user = User.objects.get(username=user.username)
+        assert user.blocked_users.all().first() == bad_user
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
         )
-        response = self.client.patch(
-            f"/video/{bad_video_id}/",
-            {},
-            format="json",
+        assert response.data == {
+            "type": "FeatureCollection",
+            "features": [],
+        }
+        user = User.objects.create(username="new world")
+        self.client.force_authenticate(user=user)
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
         )
-        assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert (
-            response.data["non_field_errors"][0]
-            == "Video must be either reported or hidden"
-        )
+        assert response.data["features"][-1]["id"] == bad_video_id
