@@ -16,6 +16,7 @@ from api.serializers import (
     VideoHideSerializer,
     VideoReportSerializer,
     VideoBlockSerializer,
+    VideosBlockedSerializer,
 )
 
 
@@ -70,8 +71,11 @@ class VideoBlockView(APIView):
             video, data=request.data, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        video = serializer.save()
+        blocked_videos = VideosBlockedSerializer(
+            video.creator.video_set.all().order_by("-created_at"), many=True
+        )
+        return Response(blocked_videos.data, status=status.HTTP_204_NO_CONTENT)
 
 
 class VideoView(APIView):

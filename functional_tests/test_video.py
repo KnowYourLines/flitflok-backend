@@ -425,13 +425,14 @@ class VideoTest(APITestCase):
         response = self.client.get(
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
         )
-        bad_video_id = response.data["features"][-1]["id"]
+        videos = response.data["features"]
+        bad_video_id = videos[-1]["id"]
         response = self.client.patch(
             f"/video/{bad_video_id}/block/",
             format="json",
         )
         assert response.status_code == HTTPStatus.NO_CONTENT
-        assert not response.data
+        assert response.data == [{"id": video["id"]} for video in videos]
         assert len(Video.objects.filter(creator=bad_user)) == 2
         user = User.objects.get(username=user.username)
         assert user.blocked_users.all().first() == bad_user

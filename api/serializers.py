@@ -108,3 +108,9 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
 
     def get_distance(self, obj):
         return obj.distance.km
+
+
+class VideosBlockedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Video
+        fields = ("id",)
