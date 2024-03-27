@@ -89,7 +89,7 @@ class VideoTest(APITestCase):
         assert response.data["file_id"][0] == "This field is required."
         assert response.data["location"][0] == "This field is required."
 
-    def test_finds_next_2_videos(self):
+    def test_finds_next_5_videos(self):
         with freeze_time("2012-01-14"):
             user = User.objects.create(username="hello world")
             self.client.force_authenticate(user=user)
@@ -276,6 +276,100 @@ class VideoTest(APITestCase):
         assert response.data == {
             "type": "FeatureCollection",
             "features": [],
+        }
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.data == {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID).id),
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.03338764624519, 51.51291201050047],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID,
+                        "distance": 0.0,
+                        "posted_at": datetime.datetime(
+                            2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_2).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID_2,
+                        "distance": 2.788929913358129,
+                        "posted_at": datetime.datetime(
+                            2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_5).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.335827, 53.767750],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID_5,
+                        "distance": 251.75032594284824,
+                        "posted_at": datetime.datetime(
+                            2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                    },
+                },
+                {
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_3).id),
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.335827, 53.767750],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID_3,
+                        "distance": 251.75032594284824,
+                        "posted_at": datetime.datetime(
+                            2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_4).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-3.188267, 55.953251],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID_4,
+                        "distance": 536.136057408564,
+                        "posted_at": datetime.datetime(
+                            2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                    },
+                },
+            ],
         }
 
     def test_current_video_must_be_valid(self):
