@@ -107,7 +107,7 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
         return obj.created_at.timestamp()
 
     def get_distance(self, obj):
-        return obj.distance.km
+        return f"{round(obj.distance.km, 1)} km"
 
 
 class VideosBlockedSerializer(serializers.ModelSerializer):

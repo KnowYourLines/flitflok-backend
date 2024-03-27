@@ -140,7 +140,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID,
-                        "distance": 0.0,
+                        "distance": "0.0 km",
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
@@ -157,7 +157,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID_2,
-                        "distance": 2.788929913358129,
+                        "distance": "2.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
@@ -226,7 +226,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID_5,
-                        "distance": 251.75032594284824,
+                        "distance": "251.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
@@ -243,7 +243,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID_3,
-                        "distance": 251.75032594284824,
+                        "distance": "251.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
@@ -260,7 +260,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID_4,
-                        "distance": 536.136057408564,
+                        "distance": "536.1 km",
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
@@ -295,7 +295,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID,
-                        "distance": 0.0,
+                        "distance": "0.0 km",
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
@@ -312,7 +312,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID_2,
-                        "distance": 2.788929913358129,
+                        "distance": "2.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
@@ -329,7 +329,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID_5,
-                        "distance": 251.75032594284824,
+                        "distance": "251.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
@@ -346,7 +346,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID_3,
-                        "distance": 251.75032594284824,
+                        "distance": "251.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
@@ -363,7 +363,7 @@ class VideoTest(APITestCase):
                         "place_name": "hello",
                         "address": "world",
                         "file_id": VALID_FILE_ID_4,
-                        "distance": 536.136057408564,
+                        "distance": "536.1 km",
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
