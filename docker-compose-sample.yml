@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgis/postgis:14-3.4
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  web:
+    build: .
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; pip install -r dev-requirements.txt; python manage.py makemigrations api; python manage.py migrate; python manage.py collectstatic --no-input; gunicorn --bind 0.0.0.0:8000 server.wsgi:application'
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - SECRET_KEY=!!f1r=78mf)an7i&t8yqy*#e%*wwcx59am^8(xor#11uh^98kt
+      - DEBUG=True
+      - ALLOWED_HOSTS=localhost
+      - FIREBASE_PROJECT_ID=
+      - FIREBASE_PRIVATE_KEY_ID=
+      - FIREBASE_PRIVATE_KEY=
+      - FIREBASE_CLIENT_EMAIL=
+      - FIREBASE_CLIENT_ID=
+      - FIREBASE_CLIENT_CERT_URL=
+      - EMAIL_HOST_USER=
+      - EMAIL_HOST_PASSWORD=
