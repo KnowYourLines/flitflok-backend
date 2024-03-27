@@ -1,6 +1,5 @@
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
-from django.db.models.functions import TruncMinute
 from firebase_admin.auth import delete_user
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
