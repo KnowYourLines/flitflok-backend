@@ -102,16 +102,11 @@ class VideoView(APIView):
         )
         if current_video_id := params.validated_data.get("current_video"):
             current_video = Video.objects.get(id=current_video_id)
-            current_video_distance = Distance(
-                current_video.location, current_location, spheroid=True
-            )
             videos = videos.filter(
-                distance__gt=current_video_distance,
-            )
-            if current_video in videos:
-                logging.error(
-                    f"{current_video_distance.km} is somehow bigger than {videos.last().distance.km}"
+                distance__gt=Distance(
+                    current_video.location, current_location, spheroid=True
                 )
+            )
         videos = videos.order_by("distance", "-created_at")[:5]
         results = VideoResultsSerializer(videos, many=True)
         return Response(results.data, status=status.HTTP_200_OK)
