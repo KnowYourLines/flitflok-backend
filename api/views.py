@@ -101,7 +101,7 @@ class VideoView(APIView):
         if current_video_id := params.validated_data.get("current_video"):
             current_video = Video.objects.get(id=current_video_id)
             current_video_distance = Distance(
-                current_location, current_video.location, spheroid=True
+                current_video.location, current_location, spheroid=True
             )
             videos = videos.filter(
                 distance__gt=current_video_distance,
