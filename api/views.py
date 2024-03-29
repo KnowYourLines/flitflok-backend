@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from firebase_admin.auth import delete_user
@@ -106,6 +108,10 @@ class VideoView(APIView):
             videos = videos.filter(
                 distance__gt=current_video_distance,
             )
+            if current_video in videos:
+                logging.error(
+                    f"{current_video_distance.km} is somehow bigger than {videos.last().distance.km}"
+                )
         videos = videos.order_by("distance", "-created_at")[:5]
         results = VideoResultsSerializer(videos, many=True)
         return Response(results.data, status=status.HTTP_200_OK)
