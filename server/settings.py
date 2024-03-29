@@ -36,6 +36,8 @@ else:
         "ALLOWED_HOSTS",
     ).split(",")
 
+CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS.copy()
+
 # Application definition
 
 INSTALLED_APPS = [
