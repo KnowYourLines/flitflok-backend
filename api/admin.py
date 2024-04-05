@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from firebase_admin import storage
-from firebase_admin.auth import delete_user
+from firebase_admin.auth import delete_user, delete_users
 
 from api.models import Video, User
 
@@ -78,6 +78,8 @@ class VideoModelAdmin(admin.ModelAdmin):
 
 
 class UserModelAdmin(admin.ModelAdmin):
+    search_fields = ["username"]
+
     def has_add_permission(self, request, obj=None):
         return False
 
@@ -89,8 +91,8 @@ class UserModelAdmin(admin.ModelAdmin):
         super().delete_model(request, obj)
 
     def delete_queryset(self, request, queryset):
-        for user in queryset.all():
-            delete_user(user.username)
+        users = [user.username for user in queryset.all()]
+        delete_users(users)
         super().delete_queryset(request, queryset)
 
 
