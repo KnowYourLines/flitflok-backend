@@ -90,6 +90,7 @@ class VideoQueryParamSerializer(serializers.Serializer):
 class VideoResultsSerializer(GeoFeatureModelSerializer):
     distance = serializers.SerializerMethodField()
     posted_at = serializers.SerializerMethodField()
+    creator = serializers.ReadOnlyField(source="creator.username")
 
     class Meta:
         model = Video
@@ -101,6 +102,7 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "file_id",
             "distance",
             "posted_at",
+            "creator",
         )
 
     def get_posted_at(self, obj):

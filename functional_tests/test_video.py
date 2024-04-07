@@ -144,6 +144,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
                 {
@@ -161,6 +162,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
             ],
@@ -230,6 +232,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
                 {
@@ -247,6 +250,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
                 {
@@ -264,6 +268,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
             ],
@@ -299,6 +304,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
                 {
@@ -316,6 +322,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
                 {
@@ -333,6 +340,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
                 {
@@ -350,6 +358,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
                 {
@@ -367,6 +376,7 @@ class VideoTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
+                        "creator": "hello world",
                     },
                 },
             ],
