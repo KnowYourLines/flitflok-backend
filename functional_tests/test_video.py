@@ -106,7 +106,7 @@ class VideoTest(APITestCase):
             format="json",
         )
         response = self.client.patch(
-            f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/go/",
+            f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/went/",
         )
         assert response.status_code == HTTPStatus.NO_CONTENT
         assert not response.data
@@ -114,19 +114,48 @@ class VideoTest(APITestCase):
         assert video.directions_requested_by.all().first() == user
         assert len(video.directions_requested_by.all()) == 1
         self.client.patch(
-            f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/go/",
+            f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/went/",
         )
         video = Video.objects.get(file_id=VALID_FILE_ID_2)
         assert len(video.directions_requested_by.all()) == 1
         user2 = User.objects.create(username="goodbye world")
         self.client.force_authenticate(user=user2)
         self.client.patch(
-            f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/go/",
+            f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/went/",
         )
         video = Video.objects.get(file_id=VALID_FILE_ID_2)
         assert user in video.directions_requested_by.all()
         assert user2 in video.directions_requested_by.all()
         assert len(video.directions_requested_by.all()) == 2
+
+    def test_counts_number_finished_views(self):
+        user = User.objects.create(username="hello world")
+        self.client.force_authenticate(user=user)
+        self.client.post(
+            "/video/",
+            {
+                "file_id": VALID_FILE_ID_2,
+                "place_name": "hello",
+                "address": "world",
+                "location": {
+                    "type": "Point",
+                    "coordinates": [-0.011591, 51.491857],
+                },
+            },
+            format="json",
+        )
+        response = self.client.patch(
+            f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/watched/",
+        )
+        assert response.status_code == HTTPStatus.NO_CONTENT
+        assert not response.data
+        video = Video.objects.get(file_id=VALID_FILE_ID_2)
+        assert video.number_finished_views == 1
+        self.client.patch(
+            f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/watched/",
+        )
+        video = Video.objects.get(file_id=VALID_FILE_ID_2)
+        assert video.number_finished_views == 2
 
     def test_finds_next_5_videos(self):
         with freeze_time("2012-01-14"):
