@@ -55,6 +55,14 @@ class VideoHideSerializer(serializers.Serializer):
         return instance
 
 
+class VideoGoSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        user = self.context["request"].user
+        instance.directions_requested_by.add(user)
+        instance.save()
+        return instance
+
+
 class VideoReportSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         user = self.context["request"].user

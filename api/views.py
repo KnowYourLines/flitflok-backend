@@ -18,6 +18,7 @@ from api.serializers import (
     VideoReportSerializer,
     VideoBlockSerializer,
     VideosBlockedSerializer,
+    VideoGoSerializer,
 )
 
 
@@ -58,6 +59,17 @@ class VideoHideView(APIView):
     def patch(self, request, pk):
         video = get_object_or_404(Video, pk=pk)
         serializer = VideoHideSerializer(
+            video, data=request.data, context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class VideoGoView(APIView):
+    def patch(self, request, pk):
+        video = get_object_or_404(Video, pk=pk)
+        serializer = VideoGoSerializer(
             video, data=request.data, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)

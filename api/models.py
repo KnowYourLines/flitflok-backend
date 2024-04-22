@@ -19,3 +19,7 @@ class Video(models.Model):
     file_id = models.UUIDField(unique=True)
     reported_by = models.ManyToManyField(User, related_name="reported_videos")
     hidden_from = models.ManyToManyField(User, related_name="hidden_videos")
+    directions_requested_by = models.ManyToManyField(
+        User, related_name="directions_requested_videos"
+    )
+    number_finished_views = models.PositiveBigIntegerField(default=0)
