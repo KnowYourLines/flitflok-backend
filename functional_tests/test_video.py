@@ -157,6 +157,154 @@ class VideoTest(APITestCase):
         video = Video.objects.get(file_id=VALID_FILE_ID_2)
         assert video.number_finished_views == 2
 
+    def test_orders_by_distance_direction_requests_timestamp_views(self):
+        user = User.objects.create(username="hello world")
+        self.client.force_authenticate(user=user)
+        with freeze_time("2012-01-14"):
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": VALID_FILE_ID,
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.0333876462451904, 51.51291201050047],
+                    },
+                },
+                format="json",
+            )
+        with freeze_time("2012-01-14"):
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": VALID_FILE_ID_2,
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                },
+                format="json",
+            )
+            self.client.patch(
+                f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/went/",
+            )
+        with freeze_time("2022-01-14"):
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": VALID_FILE_ID_3,
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                },
+                format="json",
+            )
+        with freeze_time("2022-01-14"):
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": VALID_FILE_ID_4,
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                },
+                format="json",
+            )
+            self.client.patch(
+                f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_4).id)}/viewed/",
+            )
+        current_latitude = 51.51291201050047
+        current_longitude = -0.0333876462451904
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+        )
+        assert response.data == {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID).id),
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.03338764624519, 51.51291201050047],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID,
+                        "distance": "0.0 km",
+                        "posted_at": datetime.datetime(
+                            2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                        "creator": "hello world",
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_2).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID_2,
+                        "distance": "2.8 km",
+                        "posted_at": datetime.datetime(
+                            2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                        "creator": "hello world",
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_3).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID_3,
+                        "distance": "2.8 km",
+                        "posted_at": datetime.datetime(
+                            2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                        "creator": "hello world",
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_4).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID_4,
+                        "distance": "2.8 km",
+                        "posted_at": datetime.datetime(
+                            2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                        "creator": "hello world",
+                    },
+                },
+            ],
+        }
+
     def test_finds_next_5_videos(self):
         with freeze_time("2012-01-14"):
             user = User.objects.create(username="hello world")

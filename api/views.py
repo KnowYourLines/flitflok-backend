@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
+from django.db.models import Count
 from firebase_admin.auth import delete_user
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
@@ -123,6 +124,7 @@ class VideoView(APIView):
             .exclude(hidden_from=self.request.user)
             .exclude(creator__in=self.request.user.blocked_users.all())
             .annotate(distance=Distance("location", current_location, spheroid=True))
+            .annotate(number_directions_requests=Count("directions_requested_by"))
         )
         if current_video_id := params.validated_data.get("current_video"):
             current_video = Video.objects.get(id=current_video_id)
@@ -131,6 +133,11 @@ class VideoView(APIView):
                     current_video.location, current_location, spheroid=True
                 )
             )
-        videos = videos.order_by("distance", "-created_at")[:5]
+        videos = videos.order_by(
+            "distance",
+            "-number_directions_requests",
+            "-created_at",
+            "-number_finished_views",
+        )[:5]
         results = VideoResultsSerializer(videos, many=True)
         return Response(results.data, status=status.HTTP_200_OK)
