@@ -136,8 +136,8 @@ class VideoView(APIView):
         videos = videos.order_by(
             "distance",
             "-number_directions_requests",
-            "-created_at",
             "-number_finished_views",
+            "-created_at",
         )[:5]
         results = VideoResultsSerializer(videos, many=True)
         return Response(results.data, status=status.HTTP_200_OK)

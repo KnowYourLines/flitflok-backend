@@ -179,7 +179,7 @@ class VideoTest(APITestCase):
                 "/video/",
                 {
                     "file_id": VALID_FILE_ID_2,
-                    "place_name": "hello",
+                    "place_name": "hello2",
                     "address": "world",
                     "location": {
                         "type": "Point",
@@ -196,21 +196,7 @@ class VideoTest(APITestCase):
                 "/video/",
                 {
                     "file_id": VALID_FILE_ID_3,
-                    "place_name": "hello",
-                    "address": "world",
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.011591, 51.491857],
-                    },
-                },
-                format="json",
-            )
-        with freeze_time("2022-01-14"):
-            self.client.post(
-                "/video/",
-                {
-                    "file_id": VALID_FILE_ID_4,
-                    "place_name": "hello",
+                    "place_name": "hello3",
                     "address": "world",
                     "location": {
                         "type": "Point",
@@ -220,7 +206,21 @@ class VideoTest(APITestCase):
                 format="json",
             )
             self.client.patch(
-                f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_4).id)}/viewed/",
+                f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_3).id)}/watched/",
+            )
+        with freeze_time("2023-01-14"):
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": VALID_FILE_ID_4,
+                    "place_name": "hello4",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                },
+                format="json",
             )
         current_latitude = 51.51291201050047
         current_longitude = -0.0333876462451904
@@ -256,7 +256,7 @@ class VideoTest(APITestCase):
                         "coordinates": [-0.011591, 51.491857],
                     },
                     "properties": {
-                        "place_name": "hello",
+                        "place_name": "hello2",
                         "address": "world",
                         "file_id": VALID_FILE_ID_2,
                         "distance": "2.8 km",
@@ -274,7 +274,7 @@ class VideoTest(APITestCase):
                         "coordinates": [-0.011591, 51.491857],
                     },
                     "properties": {
-                        "place_name": "hello",
+                        "place_name": "hello3",
                         "address": "world",
                         "file_id": VALID_FILE_ID_3,
                         "distance": "2.8 km",
@@ -292,12 +292,12 @@ class VideoTest(APITestCase):
                         "coordinates": [-0.011591, 51.491857],
                     },
                     "properties": {
-                        "place_name": "hello",
+                        "place_name": "hello4",
                         "address": "world",
                         "file_id": VALID_FILE_ID_4,
                         "distance": "2.8 km",
                         "posted_at": datetime.datetime(
-                            2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                            2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
                     },
