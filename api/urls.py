@@ -10,5 +10,4 @@ urlpatterns = [
     path(r"video/<uuid:pk>/report/", views.VideoReportView.as_view()),
     path(r"video/<uuid:pk>/block/", views.VideoBlockView.as_view()),
     path(r"video/<uuid:pk>/went/", views.VideoWentView.as_view()),
-    path(r"video/<uuid:pk>/watched/", views.VideoWatchedView.as_view()),
 ]

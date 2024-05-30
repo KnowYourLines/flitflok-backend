@@ -20,7 +20,6 @@ from api.serializers import (
     VideoBlockSerializer,
     VideosBlockedSerializer,
     VideoWentSerializer,
-    VideoWatchedSerializer,
 )
 
 
@@ -79,17 +78,6 @@ class VideoWentView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class VideoWatchedView(APIView):
-    def patch(self, request, pk):
-        video = get_object_or_404(Video, pk=pk)
-        serializer = VideoWatchedSerializer(
-            video, data=request.data, context={"request": request}
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class VideoBlockView(APIView):
     def patch(self, request, pk):
         video = get_object_or_404(Video, pk=pk)
@@ -136,7 +124,6 @@ class VideoView(APIView):
         videos = videos.order_by(
             "distance",
             "-number_directions_requests",
-            "-number_finished_views",
             "-created_at",
         )[:5]
         results = VideoResultsSerializer(videos, many=True)

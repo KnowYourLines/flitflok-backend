@@ -63,14 +63,6 @@ class VideoWentSerializer(serializers.Serializer):
         return instance
 
 
-class VideoWatchedSerializer(serializers.Serializer):
-    def update(self, instance, validated_data):
-        user = self.context["request"].user
-        instance.number_finished_views += 1
-        instance.save()
-        return instance
-
-
 class VideoReportSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         user = self.context["request"].user

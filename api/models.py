@@ -22,4 +22,3 @@ class Video(models.Model):
     directions_requested_by = models.ManyToManyField(
         User, related_name="directions_requested_videos"
     )
-    number_finished_views = models.PositiveBigIntegerField(default=0)
