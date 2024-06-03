@@ -128,7 +128,7 @@ class VideoTest(APITestCase):
         assert user2 in video.directions_requested_by.all()
         assert len(video.directions_requested_by.all()) == 2
 
-    def test_orders_by_distance_direction_requests_timestamp(self):
+    def test_orders_by_distance_creator_points_direction_requests_timestamp(self):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
         with freeze_time("2012-01-14"):
@@ -162,6 +162,29 @@ class VideoTest(APITestCase):
             self.client.patch(
                 f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/went/",
             )
+        user2 = User.objects.create(username="goodbye world")
+        self.client.force_authenticate(user=user2)
+        with freeze_time("2023-01-14"):
+            self.client.post(
+                "/video/",
+                {
+                    "file_id": VALID_FILE_ID_3,
+                    "place_name": "hello3",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                },
+                format="json",
+            )
+            self.client.patch(
+                f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_3).id)}/went/",
+            )
+            self.client.patch(
+                f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_3).id)}/went/",
+            )
+        self.client.force_authenticate(user=user)
         with freeze_time("2023-01-14"):
             self.client.post(
                 "/video/",
@@ -236,6 +259,24 @@ class VideoTest(APITestCase):
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_3).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                    "properties": {
+                        "place_name": "hello3",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID_3,
+                        "distance": "2.8 km",
+                        "posted_at": datetime.datetime(
+                            2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                        "creator": "goodbye world",
                     },
                 },
             ],

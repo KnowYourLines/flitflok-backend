@@ -123,6 +123,7 @@ class VideoView(APIView):
             )
         videos = videos.order_by(
             "distance",
+            "-creator__points",
             "-number_directions_requests",
             "-created_at",
         )[:5]
