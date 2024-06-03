@@ -1,5 +1,6 @@
 import os
 
+from django.contrib.gis.measure import D
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -31,6 +32,16 @@ class VideoSerializer(GeoFeatureModelSerializer):
             raise serializers.ValidationError("File does not exist")
         return value
 
+    def create(self, validated_data):
+        user = self.context["request"].user
+        new_location = validated_data["location"]
+        if not Video.objects.filter(
+            location__distance_lte=(new_location, D(mi=1))
+        ).exists():
+            user.points += 10000
+            user.save()
+        return super().create(validated_data)
+
 
 class VideoBlockSerializer(serializers.Serializer):
     creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -57,7 +68,12 @@ class VideoHideSerializer(serializers.Serializer):
 
 class VideoWentSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
+        num_videos_around = Video.objects.filter(
+            location__distance_lte=(instance.location, D(mi=1))
+        ).count()
         user = self.context["request"].user
+        user.points += 10 * num_videos_around
+        user.save()
         instance.directions_requested_by.add(user)
         instance.save()
         return instance
