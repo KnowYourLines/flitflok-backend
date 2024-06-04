@@ -2,7 +2,8 @@ import logging
 
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
-from django.db.models import Count
+from django.db.models import Count, F, Window
+from django.db.models.functions import DenseRank
 from firebase_admin.auth import delete_user
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
@@ -113,6 +114,12 @@ class VideoView(APIView):
             .exclude(creator__in=self.request.user.blocked_users.all())
             .annotate(distance=Distance("location", current_location, spheroid=True))
             .annotate(number_directions_requests=Count("directions_requested_by"))
+            .annotate(
+                creator_rank=Window(
+                    expression=DenseRank(),
+                    order_by=F("creator__points").desc(),
+                )
+            )
         )
         if current_video_id := params.validated_data.get("current_video"):
             current_video = Video.objects.get(id=current_video_id)

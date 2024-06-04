@@ -114,6 +114,7 @@ class VideoQueryParamSerializer(serializers.Serializer):
 class VideoResultsSerializer(GeoFeatureModelSerializer):
     distance = serializers.SerializerMethodField()
     posted_at = serializers.SerializerMethodField()
+    creator_rank = serializers.SerializerMethodField()
     creator = serializers.ReadOnlyField(source="creator.username")
 
     class Meta:
@@ -127,6 +128,7 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "distance",
             "posted_at",
             "creator",
+            "creator_rank",
         )
 
     def get_posted_at(self, obj):
@@ -134,6 +136,9 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
 
     def get_distance(self, obj):
         return f"{round(obj.distance.km, 1)} km"
+
+    def get_creator_rank(self, obj):
+        return obj.creator_rank
 
 
 class VideosBlockedSerializer(serializers.ModelSerializer):

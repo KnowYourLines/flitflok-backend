@@ -204,6 +204,7 @@ class VideoTest(APITestCase):
         response = self.client.get(
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
         )
+        print(response.data)
         assert response.data == {
             "type": "FeatureCollection",
             "features": [
@@ -223,6 +224,7 @@ class VideoTest(APITestCase):
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -241,6 +243,7 @@ class VideoTest(APITestCase):
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -259,6 +262,7 @@ class VideoTest(APITestCase):
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -277,6 +281,7 @@ class VideoTest(APITestCase):
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "goodbye world",
+                        "creator_rank": 2,
                     },
                 },
             ],
@@ -338,6 +343,7 @@ class VideoTest(APITestCase):
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -356,6 +362,7 @@ class VideoTest(APITestCase):
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
             ],
@@ -426,6 +433,7 @@ class VideoTest(APITestCase):
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -444,6 +452,7 @@ class VideoTest(APITestCase):
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -462,6 +471,7 @@ class VideoTest(APITestCase):
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
             ],
@@ -498,6 +508,7 @@ class VideoTest(APITestCase):
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -516,6 +527,7 @@ class VideoTest(APITestCase):
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -534,6 +546,7 @@ class VideoTest(APITestCase):
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -552,6 +565,7 @@ class VideoTest(APITestCase):
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
                 {
@@ -570,6 +584,7 @@ class VideoTest(APITestCase):
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
+                        "creator_rank": 1,
                     },
                 },
             ],
