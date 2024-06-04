@@ -21,7 +21,14 @@ from api.serializers import (
     VideoBlockSerializer,
     VideosBlockedSerializer,
     VideoWentSerializer,
+    UserRankSerializer,
 )
+
+
+class RankView(APIView):
+    def get(self, request):
+        serializer = UserRankSerializer(request.user)
+        return Response(serializer.data)
 
 
 class EulaAgreedView(APIView):

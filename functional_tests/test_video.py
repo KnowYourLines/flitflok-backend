@@ -204,7 +204,6 @@ class VideoTest(APITestCase):
         response = self.client.get(
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
         )
-        print(response.data)
         assert response.data == {
             "type": "FeatureCollection",
             "features": [

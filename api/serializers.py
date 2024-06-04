@@ -11,6 +11,19 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from api.models import User, Video
 
 
+class UserRankSerializer(serializers.ModelSerializer):
+    rank = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["rank"]
+
+    def get_rank(self, obj):
+        user_points = obj.points
+        num_users_ranked_above = User.objects.filter(points__gt=user_points).count()
+        return num_users_ranked_above + 1
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
