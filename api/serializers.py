@@ -30,6 +30,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["agreed_to_eula"]
 
 
+class DisplayNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["display_name"]
+
+
 class VideoSerializer(GeoFeatureModelSerializer):
     creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
 

@@ -22,7 +22,23 @@ from api.serializers import (
     VideosBlockedSerializer,
     VideoWentSerializer,
     UserRankSerializer,
+    DisplayNameSerializer,
 )
+
+
+class DisplayNameView(APIView):
+    def get(self, request):
+        serializer = DisplayNameSerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        serializer = DisplayNameSerializer(
+            request.user,
+            data=request.data,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class RankView(APIView):
