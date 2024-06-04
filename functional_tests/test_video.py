@@ -224,6 +224,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -243,6 +244,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -262,6 +264,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -281,6 +284,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "goodbye world",
                         "creator_rank": 2,
+                        "display_name": None,
                     },
                 },
             ],
@@ -343,6 +347,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -362,6 +367,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
             ],
@@ -433,6 +439,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -452,6 +459,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -471,6 +479,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
             ],
@@ -508,6 +517,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -527,6 +537,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -546,6 +557,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -565,6 +577,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
                 {
@@ -584,6 +597,7 @@ class VideoTest(APITestCase):
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
+                        "display_name": None,
                     },
                 },
             ],

@@ -144,6 +144,7 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
     posted_at = serializers.SerializerMethodField()
     creator_rank = serializers.SerializerMethodField()
     creator = serializers.ReadOnlyField(source="creator.username")
+    display_name = serializers.ReadOnlyField(source="creator.display_name")
 
     class Meta:
         model = Video
@@ -157,6 +158,7 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "posted_at",
             "creator",
             "creator_rank",
+            "display_name",
         )
 
     def get_posted_at(self, obj):
