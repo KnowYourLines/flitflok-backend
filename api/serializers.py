@@ -87,12 +87,21 @@ class VideoHideSerializer(serializers.Serializer):
 
 class VideoWentSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
-        num_videos_around = Video.objects.filter(
-            location__distance_lte=(instance.location, D(mi=1))
-        ).count()
         user = self.context["request"].user
-        user.points += 10 * num_videos_around
-        user.save()
+        if (
+            not instance.directions_requested_by.filter(username=user.username).exists()
+            and instance.creator != user
+        ):
+            num_unique_creator_videos_around = 1 + (
+                Video.objects.filter(
+                    location__distance_lte=(instance.location, D(mi=1))
+                )
+                .exclude(creator=instance.creator)
+                .count()
+            )
+            creator = instance.creator
+            creator.points += 10 * num_unique_creator_videos_around
+            creator.save()
         instance.directions_requested_by.add(user)
         instance.save()
         return instance

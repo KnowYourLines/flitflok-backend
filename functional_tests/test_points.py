@@ -4,6 +4,7 @@ from api.models import User, Video
 
 VALID_FILE_ID = "0888bcb9-c5b1-4587-8ed8-1aed45a04313"
 VALID_FILE_ID_2 = "09991e04-1ef9-4a8e-ac94-8a19faa2de1b"
+VALID_FILE_ID_3 = "0dbc46ba-f87a-4ff0-a737-e0538c70c4ef"
 
 
 class PointsTest(APITestCase):
@@ -58,7 +59,7 @@ class PointsTest(APITestCase):
         self.client.patch(
             f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID).id)}/went/",
         )
-        assert user.points == 10010
+        assert user.points == 10000
         self.client.post(
             "/video/",
             {
@@ -72,7 +73,30 @@ class PointsTest(APITestCase):
             },
             format="json",
         )
+        user2 = User.objects.create(username="goodbye world")
+        self.client.force_authenticate(user=user2)
         self.client.patch(
             f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID).id)}/went/",
         )
+        user = User.objects.get(username="hello world")
+        assert user.points == 10010
+        self.client.post(
+            "/video/",
+            {
+                "file_id": VALID_FILE_ID_3,
+                "place_name": "hello",
+                "address": "world",
+                "location": {
+                    "type": "Point",
+                    "coordinates": [-0.0333876462451904, 51.51291201050047],
+                },
+            },
+            format="json",
+        )
+        user3 = User.objects.create(username="hello again")
+        self.client.force_authenticate(user=user3)
+        self.client.patch(
+            f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID).id)}/went/",
+        )
+        user = User.objects.get(username="hello world")
         assert user.points == 10030
