@@ -8,7 +8,7 @@ class User(AbstractUser):
     agreed_to_eula = models.BooleanField(default=False)
     blocked_users = models.ManyToManyField("self", blank=True)
     points = models.PositiveBigIntegerField(default=0)
-    display_name = models.CharField(max_length=150, null=True, blank=True, unique=True)
+    display_name = models.CharField(max_length=28, null=True, blank=True, unique=True)
 
 
 class Video(models.Model):
