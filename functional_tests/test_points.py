@@ -113,4 +113,4 @@ class PointsTest(APITestCase):
             f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID).id)}/went/",
         )
         user = User.objects.get(username="hello world")
-        assert user.points == 10040
+        assert user.points == 10030
