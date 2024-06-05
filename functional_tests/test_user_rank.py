@@ -13,10 +13,10 @@ class UserRankingTest(APITestCase):
         self.client.force_authenticate(user=user)
         response = self.client.get("/rank/")
         assert response.status_code == HTTPStatus.OK
-        assert response.data == {"rank": 1}
+        assert response.data == {"rank": 1, "points": 0}
         self.client.force_authenticate(user=user2)
         response = self.client.get("/rank/")
-        assert response.data == {"rank": 1}
+        assert response.data == {"rank": 1, "points": 0}
         self.client.post(
             "/video/",
             {
@@ -31,7 +31,7 @@ class UserRankingTest(APITestCase):
             format="json",
         )
         response = self.client.get("/rank/")
-        assert response.data == {"rank": 1}
+        assert response.data == {"rank": 1, "points": 10000}
         self.client.force_authenticate(user=user)
         response = self.client.get("/rank/")
-        assert response.data == {"rank": 2}
+        assert response.data == {"rank": 2, "points": 0}
