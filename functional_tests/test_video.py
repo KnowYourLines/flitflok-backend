@@ -128,7 +128,7 @@ class VideoTest(APITestCase):
         assert user2 in video.directions_requested_by.all()
         assert len(video.directions_requested_by.all()) == 2
 
-    def test_orders_by_distance_creator_points_direction_requests_timestamp(self):
+    def test_orders_by_distance_creator_points_timestamp(self):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
         with freeze_time("2012-01-14"):
@@ -159,9 +159,6 @@ class VideoTest(APITestCase):
                 },
                 format="json",
             )
-            self.client.patch(
-                f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_2).id)}/went/",
-            )
         user2 = User.objects.create(username="goodbye world")
         self.client.force_authenticate(user=user2)
         with freeze_time("2023-01-14"):
@@ -177,12 +174,6 @@ class VideoTest(APITestCase):
                     },
                 },
                 format="json",
-            )
-            self.client.patch(
-                f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_3).id)}/went/",
-            )
-            self.client.patch(
-                f"/video/{str(Video.objects.get(file_id=VALID_FILE_ID_3).id)}/went/",
             )
         self.client.force_authenticate(user=user)
         with freeze_time("2023-01-14"):
@@ -229,26 +220,6 @@ class VideoTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_2).id),
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [-0.011591, 51.491857],
-                    },
-                    "properties": {
-                        "place_name": "hello2",
-                        "address": "world",
-                        "file_id": VALID_FILE_ID_2,
-                        "distance": "2.8 km",
-                        "posted_at": datetime.datetime(
-                            2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
-                        ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
-                        "display_name": None,
-                    },
-                },
-                {
-                    "type": "Feature",
                     "id": str(Video.objects.get(file_id=VALID_FILE_ID_4).id),
                     "geometry": {
                         "type": "Point",
@@ -261,6 +232,26 @@ class VideoTest(APITestCase):
                         "distance": "2.8 km",
                         "posted_at": datetime.datetime(
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                        "creator": "hello world",
+                        "creator_rank": 1,
+                        "display_name": None,
+                    },
+                },
+                {
+                    "type": "Feature",
+                    "id": str(Video.objects.get(file_id=VALID_FILE_ID_2).id),
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.011591, 51.491857],
+                    },
+                    "properties": {
+                        "place_name": "hello2",
+                        "address": "world",
+                        "file_id": VALID_FILE_ID_2,
+                        "distance": "2.8 km",
+                        "posted_at": datetime.datetime(
+                            2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
                         "creator_rank": 1,
