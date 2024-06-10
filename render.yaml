@@ -36,6 +36,12 @@ services:
         sync: false
       - key: EMAIL_HOST_PASSWORD
         sync: false
+      - key: MUX_TOKEN_ID
+        sync: false
+      - key: MUX_TOKEN_SECRET
+        sync: false
+      - key: MUX_SIGNING_SECRET
+        sync: false
 
 databases:
   - name: flitflok-db

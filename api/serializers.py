@@ -5,7 +5,7 @@ from django.contrib.gis.measure import D
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from firebase_admin import storage
+from firebase_admin import storage, auth
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
@@ -68,6 +68,12 @@ class VideoUploadSerializer(GeoFeatureModelSerializer):
             "url": create_upload_response.url,
             "passthrough": create_upload_response.new_asset_settings.passthrough,
         }
+
+    def validate_creator(self, creator):
+        user = auth.get_user(creator.username)
+        if not user.email_verified:
+            raise serializers.ValidationError("Verified email address required")
+        return creator
 
 
 class VideoSerializer(GeoFeatureModelSerializer):

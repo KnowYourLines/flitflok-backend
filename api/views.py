@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models import Video
+from api.permissions import WebhookPermission
 from api.serializers import (
     UserSerializer,
     VideoSerializer,
@@ -27,6 +28,16 @@ from api.serializers import (
 )
 
 
+class MuxWebhookView(APIView):
+    authentication_classes = []
+    permission_classes = [WebhookPermission]
+
+    def post(self, request):
+        print(request.headers)
+        print(request.data)
+        return Response({})
+
+
 class VideoUploadView(APIView):
     def get(self, request):
         serializer = VideoUploadSerializer(
@@ -34,7 +45,7 @@ class VideoUploadView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data)
 
 
 class DisplayNameView(APIView):
