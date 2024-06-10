@@ -12,6 +12,31 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from api.models import User, Video
 
 
+class PlaybackIdSerializer(serializers.Serializer):
+    id = serializers.CharField()
+
+
+class VideoReadyDataSerializer(serializers.Serializer):
+    playback_ids = serializers.ListField(child=PlaybackIdSerializer(), required=False)
+    passthrough = serializers.CharField(required=False)
+
+
+class WebhookEventSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    data = VideoReadyDataSerializer(required=False)
+
+    def save(self):
+        event_type = self.validated_data["type"]
+        data = self.validated_data.get("data", {})
+        playback_ids = data.get("playback_ids", [])
+        passthrough = data.get("passthrough", "")
+        if event_type == "video.asset.ready":
+            video = Video.objects.get(id=passthrough)
+            playback_id = playback_ids[0]["id"]
+            video.playback_id = playback_id
+            video.save()
+
+
 class UserRankSerializer(serializers.ModelSerializer):
     rank = serializers.SerializerMethodField()
 

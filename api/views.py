@@ -25,6 +25,7 @@ from api.serializers import (
     UserRankSerializer,
     DisplayNameSerializer,
     VideoUploadSerializer,
+    WebhookEventSerializer,
 )
 
 
@@ -33,9 +34,12 @@ class MuxWebhookView(APIView):
     permission_classes = [WebhookPermission]
 
     def post(self, request):
-        print(request.headers)
-        print(request.data)
-        return Response({})
+        serializer = WebhookEventSerializer(
+            data=request.data,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class VideoUploadView(APIView):
