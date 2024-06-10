@@ -23,7 +23,18 @@ from api.serializers import (
     VideoWentSerializer,
     UserRankSerializer,
     DisplayNameSerializer,
+    VideoUploadSerializer,
 )
+
+
+class VideoUploadView(APIView):
+    def get(self, request):
+        serializer = VideoUploadSerializer(
+            data=request.data, context={"request": self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class DisplayNameView(APIView):

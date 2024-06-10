@@ -1,5 +1,6 @@
 import os
 
+import mux_python
 from django.contrib.gis.measure import D
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -34,6 +35,39 @@ class DisplayNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["display_name"]
+
+
+class VideoUploadSerializer(GeoFeatureModelSerializer):
+    creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    url = serializers.URLField(read_only=True)
+    passthrough = serializers.UUIDField(read_only=True)
+
+    class Meta:
+        model = Video
+        geo_field = "location"
+        fields = ["creator", "url", "passthrough"]
+
+    def create(self, validated_data):
+        new_video = super().create(validated_data)
+        configuration = mux_python.Configuration()
+        configuration.username = os.environ["MUX_TOKEN_ID"]
+        configuration.password = os.environ["MUX_TOKEN_SECRET"]
+        uploads_api = mux_python.DirectUploadsApi(mux_python.ApiClient(configuration))
+        create_asset_request = mux_python.CreateAssetRequest(
+            passthrough=str(new_video.id),
+            playback_policy=[mux_python.PlaybackPolicy.PUBLIC],
+            encoding_tier="baseline",
+        )
+        create_upload_request = mux_python.CreateUploadRequest(
+            timeout=3600, new_asset_settings=create_asset_request, cors_origin="*"
+        )
+        create_upload_response = uploads_api.create_direct_upload(
+            create_upload_request
+        ).data
+        return {
+            "url": create_upload_response.url,
+            "passthrough": create_upload_response.new_asset_settings.passthrough,
+        }
 
 
 class VideoSerializer(GeoFeatureModelSerializer):
