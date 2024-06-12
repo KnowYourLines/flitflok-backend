@@ -49,7 +49,7 @@ class MuxWebhookTest(APITestCase):
         assert response.status_code == HTTPStatus.OK
 
     @patch.object(IsFromMux, "has_permission")
-    def test_bypasses_permissions(self, mock_has_permission):
+    def test_saves_asset_info(self, mock_has_permission):
         user = User.objects.create()
         video = Video.objects.create(creator=user)
         mock_has_permission.return_value = True
@@ -142,3 +142,4 @@ class MuxWebhookTest(APITestCase):
         assert response.status_code == HTTPStatus.OK
         video = Video.objects.get(id=video.id)
         assert video.playback_id == "9P57BUhqIjJNi4RKPR02XVZmAYSSjuj6tVOK6DDe7MgM"
+        assert video.asset_id == "d67h5rEZl02A5302VZ2Sx01frHf1tuJoDvbuuPNb8Gjza8"

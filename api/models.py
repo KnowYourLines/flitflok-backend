@@ -19,6 +19,7 @@ class Video(models.Model):
     address = models.TextField(blank=True)
     location = models.PointField(null=True)
     playback_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
+    asset_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
     reported_by = models.ManyToManyField(User, related_name="reported_videos")
     hidden_from = models.ManyToManyField(User, related_name="hidden_videos")
     directions_requested_by = models.ManyToManyField(

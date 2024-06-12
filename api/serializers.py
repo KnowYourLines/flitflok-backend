@@ -20,6 +20,7 @@ class PlaybackIdSerializer(serializers.Serializer):
 class VideoReadyDataSerializer(serializers.Serializer):
     playback_ids = serializers.ListField(child=PlaybackIdSerializer(), required=False)
     passthrough = serializers.CharField(required=False)
+    id = serializers.CharField(required=False)
 
 
 class WebhookEventSerializer(serializers.Serializer):
@@ -28,13 +29,15 @@ class WebhookEventSerializer(serializers.Serializer):
 
     def save(self):
         event_type = self.validated_data["type"]
-        data = self.validated_data.get("data", {})
-        playback_ids = data.get("playback_ids", [])
-        passthrough = data.get("passthrough", "")
         if event_type == "video.asset.ready":
+            data = self.validated_data.get("data", {})
+            playback_ids = data.get("playback_ids", [])
+            passthrough = data.get("passthrough", "")
+            asset_id = data.get("id")
             video = Video.objects.get(id=passthrough)
             playback_id = playback_ids[0]["id"]
             video.playback_id = playback_id
+            video.asset_id = asset_id
             video.save()
 
 
