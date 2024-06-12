@@ -105,11 +105,62 @@ class VideoUpdateTest(APITestCase):
         assert user2 in video.directions_requested_by.all()
         assert len(video.directions_requested_by.all()) == 2
 
+    def test_omits_videos_without_playback_id(self):
+        user = User.objects.create(username="hello world")
+        self.client.force_authenticate(user=user)
+        video = Video.objects.create(creator=user, playback_id="1")
+        with freeze_time("2012-01-14"):
+            self.client.patch(
+                f"/video/{video.id}/",
+                {
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.0333876462451904, 51.51291201050047],
+                    },
+                },
+                format="json",
+            )
+        Video.objects.create(creator=user)
+        Video.objects.create(creator=user, playback_id="")
+        current_latitude = 51.51291201050047
+        current_longitude = -0.0333876462451904
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.data == {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": str(Video.objects.get(place_name="hello").id),
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.03338764624519, 51.51291201050047],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "distance": "0.0 km",
+                        "posted_at": datetime.datetime(
+                            2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                        "creator": "hello world",
+                        "creator_rank": 1,
+                        "display_name": None,
+                        "playback_id": "1",
+                    },
+                },
+            ],
+        }
+
     def test_orders_by_distance_creator_points_timestamp(self):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
         with freeze_time("2012-01-14"):
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="1")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -123,7 +174,7 @@ class VideoUpdateTest(APITestCase):
                 format="json",
             )
         with freeze_time("2012-01-14"):
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="2")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -139,7 +190,7 @@ class VideoUpdateTest(APITestCase):
         user2 = User.objects.create(username="goodbye world")
         self.client.force_authenticate(user=user2)
         with freeze_time("2023-01-14"):
-            video = Video.objects.create(creator=user2)
+            video = Video.objects.create(creator=user2, playback_id="3")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -154,7 +205,7 @@ class VideoUpdateTest(APITestCase):
             )
         self.client.force_authenticate(user=user)
         with freeze_time("2023-01-14"):
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="4")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -192,6 +243,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "1",
                     },
                 },
                 {
@@ -211,6 +263,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "4",
                     },
                 },
                 {
@@ -230,6 +283,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "2",
                     },
                 },
                 {
@@ -249,6 +303,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "goodbye world",
                         "creator_rank": 2,
                         "display_name": None,
+                        "playback_id": "3",
                     },
                 },
             ],
@@ -258,7 +313,7 @@ class VideoUpdateTest(APITestCase):
         with freeze_time("2012-01-14"):
             user = User.objects.create(username="hello world")
             self.client.force_authenticate(user=user)
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="1")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -272,7 +327,7 @@ class VideoUpdateTest(APITestCase):
                 format="json",
             )
         with freeze_time("2022-01-14"):
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="2")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -311,6 +366,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "1",
                     },
                 },
                 {
@@ -330,12 +386,13 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "2",
                     },
                 },
             ],
         }
         with freeze_time("2022-01-14"):
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="3")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -349,7 +406,7 @@ class VideoUpdateTest(APITestCase):
                 format="json",
             )
         with freeze_time("2022-02-14"):
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="4")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -363,7 +420,7 @@ class VideoUpdateTest(APITestCase):
                 format="json",
             )
         with freeze_time("2022-01-15"):
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="5")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -401,6 +458,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "5",
                     },
                 },
                 {
@@ -420,6 +478,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "3",
                     },
                 },
                 {
@@ -439,6 +498,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "4",
                     },
                 },
             ],
@@ -476,6 +536,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "1",
                     },
                 },
                 {
@@ -495,6 +556,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "2",
                     },
                 },
                 {
@@ -514,6 +576,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "5",
                     },
                 },
                 {
@@ -533,6 +596,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "3",
                     },
                 },
                 {
@@ -552,6 +616,7 @@ class VideoUpdateTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
+                        "playback_id": "4",
                     },
                 },
             ],
@@ -574,7 +639,7 @@ class VideoUpdateTest(APITestCase):
     def test_reports_video(self):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
-        video = Video.objects.create(creator=user)
+        video = Video.objects.create(creator=user, playback_id="1")
         self.client.patch(
             f"/video/{video.id}/",
             {
@@ -625,7 +690,7 @@ class VideoUpdateTest(APITestCase):
     def test_hides_video(self):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
-        video = Video.objects.create(creator=user)
+        video = Video.objects.create(creator=user, playback_id="1")
         self.client.patch(
             f"/video/{video.id}/",
             {
@@ -670,7 +735,7 @@ class VideoUpdateTest(APITestCase):
         bad_user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=bad_user)
         with freeze_time("2022-01-14"):
-            video = Video.objects.create(creator=bad_user)
+            video = Video.objects.create(creator=bad_user, playback_id="1")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -684,7 +749,7 @@ class VideoUpdateTest(APITestCase):
                 format="json",
             )
         with freeze_time("2022-01-15"):
-            video = Video.objects.create(creator=bad_user)
+            video = Video.objects.create(creator=bad_user, playback_id="2")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -733,7 +798,7 @@ class VideoUpdateTest(APITestCase):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
         with freeze_time("2022-01-14"):
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="1")
             self.client.patch(
                 f"/video/{video.id}/",
                 {
@@ -747,7 +812,7 @@ class VideoUpdateTest(APITestCase):
                 format="json",
             )
         with freeze_time("2022-01-15"):
-            video = Video.objects.create(creator=user)
+            video = Video.objects.create(creator=user, playback_id="2")
             self.client.patch(
                 f"/video/{video.id}/",
                 {

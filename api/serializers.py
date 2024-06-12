@@ -220,6 +220,7 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "creator",
             "creator_rank",
             "display_name",
+            "playback_id",
         )
 
     def get_posted_at(self, obj):
