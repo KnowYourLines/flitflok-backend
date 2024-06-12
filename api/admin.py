@@ -1,12 +1,17 @@
-import datetime
+import os
 
+import mux_python
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from firebase_admin import storage
 from firebase_admin.auth import delete_user, delete_users
 
 from api.models import Video, User
+
+configuration = mux_python.Configuration()
+configuration.username = os.environ["MUX_TOKEN_ID"]
+configuration.password = os.environ["MUX_TOKEN_SECRET"]
+assets_api = mux_python.AssetsApi(mux_python.ApiClient(configuration))
 
 
 class ReportedVideoListFilter(admin.SimpleListFilter):
@@ -52,26 +57,16 @@ class VideoModelAdmin(admin.ModelAdmin):
         return False
 
     def display_video(self, obj):
-        bucket = storage.bucket()
-        blob = bucket.blob(str(obj.file_id))
-        url = blob.generate_signed_url(
-            version="v4",
-            expiration=datetime.timedelta(days=7),
-            method="GET",
-        )
+        url = f"https://stream.new/v/{obj.playback_id}"
         return mark_safe("<a href='%s' target='_blank' >View</a>" % url)
 
     def delete_model(self, request, obj):
-        bucket = storage.bucket()
-        blob = bucket.blob(str(obj.file_id))
-        blob.delete()
+        assets_api.delete_asset(obj.asset_id)
         super().delete_model(request, obj)
 
     def delete_queryset(self, request, queryset):
-        bucket = storage.bucket()
         for video in queryset.all():
-            blob = bucket.blob(str(video.file_id))
-            blob.delete()
+            assets_api.delete_asset(video.asset_id)
         super().delete_queryset(request, queryset)
 
     display_video.short_description = "Video"
