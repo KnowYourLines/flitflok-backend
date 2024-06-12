@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from rest_framework.test import APITestCase
 
-from api.models import User
+from api.models import User, Video
 
 VALID_FILE_ID = "0888bcb9-c5b1-4587-8ed8-1aed45a04313"
 
@@ -17,10 +17,10 @@ class UserRankingTest(APITestCase):
         self.client.force_authenticate(user=user2)
         response = self.client.get("/rank/")
         assert response.data == {"rank": 1, "points": 0}
-        self.client.post(
-            "/video/",
+        video = Video.objects.create(creator=user2)
+        self.client.patch(
+            f"/video/{video.id}/",
             {
-                "file_id": VALID_FILE_ID,
                 "place_name": "hello",
                 "address": "world",
                 "location": {
