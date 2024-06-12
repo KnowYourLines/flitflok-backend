@@ -1,13 +1,12 @@
 import datetime
 import hashlib
 import hmac
-import json
 import os
 
 from rest_framework import permissions
 
 
-class WebhookPermission(permissions.BasePermission):
+class IsFromMux(permissions.BasePermission):
     def has_permission(self, request, view):
         mux_signature = request.META.get("HTTP_MUX_SIGNATURE")
         if not mux_signature:
@@ -28,3 +27,8 @@ class WebhookPermission(permissions.BasePermission):
             datetime.datetime.now() - datetime.datetime.fromtimestamp(int(timestamp))
         ).total_seconds() <= 300
         return valid_signature and valid_timestamp
+
+
+class IsVideoCreator(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.creator == request.user

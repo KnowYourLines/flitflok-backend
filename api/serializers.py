@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import mux_python
@@ -5,7 +6,7 @@ from django.contrib.gis.measure import D
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from firebase_admin import storage, auth
+from firebase_admin import auth
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
@@ -101,22 +102,13 @@ class VideoUploadSerializer(GeoFeatureModelSerializer):
         return creator
 
 
-class VideoSerializer(GeoFeatureModelSerializer):
-    creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
+class VideoUpdateSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Video
         geo_field = "location"
-        fields = ("creator", "place_name", "address", "file_id")
+        fields = ("place_name", "address")
 
-    def validate_file_id(self, value):
-        bucket = storage.bucket()
-        blob = bucket.blob(str(value))
-        if not blob.exists():
-            raise serializers.ValidationError("File does not exist")
-        return value
-
-    def create(self, validated_data):
+    def update(self, instance, validated_data):
         user = self.context["request"].user
         new_location = validated_data["location"]
         if not Video.objects.filter(
@@ -124,7 +116,10 @@ class VideoSerializer(GeoFeatureModelSerializer):
         ).exists():
             user.points += 10000
             user.save()
-        return super().create(validated_data)
+
+        instance.uploaded_at = datetime.datetime.utcnow()
+        instance.save()
+        return super().update(instance, validated_data)
 
 
 class VideoBlockSerializer(serializers.Serializer):
@@ -220,7 +215,6 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "id",
             "place_name",
             "address",
-            "file_id",
             "distance",
             "posted_at",
             "creator",
@@ -229,7 +223,7 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
         )
 
     def get_posted_at(self, obj):
-        return obj.created_at.timestamp()
+        return obj.uploaded_at.timestamp()
 
     def get_distance(self, obj):
         return f"{round(obj.distance.km, 1)} km"

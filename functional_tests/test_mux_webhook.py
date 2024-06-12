@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 from http import HTTPStatus
 
 from api.models import User, Video
-from api.permissions import WebhookPermission
+from api.permissions import IsFromMux
 
 
 class MuxWebhookTest(APITestCase):
@@ -48,7 +48,7 @@ class MuxWebhookTest(APITestCase):
             )
         assert response.status_code == HTTPStatus.OK
 
-    @patch.object(WebhookPermission, "has_permission")
+    @patch.object(IsFromMux, "has_permission")
     def test_bypasses_permissions(self, mock_has_permission):
         user = User.objects.create()
         video = Video.objects.create(creator=user)
@@ -139,7 +139,6 @@ class MuxWebhookTest(APITestCase):
                 "Mux-Signature": "t=1718058242,v1=d6a4b3e3a83320b9af87d8717e2cf0700ec246416750c2ac27e5bc0987b19cf6"
             },
         )
-        print(response.data)
         assert response.status_code == HTTPStatus.OK
         video = Video.objects.get(id=video.id)
         assert video.playback_id == "9P57BUhqIjJNi4RKPR02XVZmAYSSjuj6tVOK6DDe7MgM"

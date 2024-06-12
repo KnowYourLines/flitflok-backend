@@ -13,7 +13,7 @@ class User(AbstractUser):
 
 class Video(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_at = models.DateTimeField(null=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     place_name = models.TextField(blank=True)
     address = models.TextField(blank=True)

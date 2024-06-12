@@ -11,10 +11,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models import Video
-from api.permissions import WebhookPermission
+from api.permissions import IsFromMux, IsVideoCreator
 from api.serializers import (
     UserSerializer,
-    VideoSerializer,
+    VideoUpdateSerializer,
     VideoQueryParamSerializer,
     VideoResultsSerializer,
     VideoHideSerializer,
@@ -31,7 +31,7 @@ from api.serializers import (
 
 class MuxWebhookView(APIView):
     authentication_classes = []
-    permission_classes = [WebhookPermission]
+    permission_classes = [IsFromMux]
 
     def post(self, request):
         serializer = WebhookEventSerializer(
@@ -137,20 +137,26 @@ class VideoBlockView(APIView):
         serializer.is_valid(raise_exception=True)
         video = serializer.save()
         blocked_videos = VideosBlockedSerializer(
-            video.creator.video_set.all().order_by("-created_at"), many=True
+            video.creator.video_set.all().order_by("-uploaded_at"), many=True
         )
         return Response(blocked_videos.data, status=status.HTTP_200_OK)
 
 
-class VideoView(APIView):
-    def post(self, request):
-        serializer = VideoSerializer(
-            data=request.data, context={"request": self.request}
+class VideoUpdateView(APIView):
+    permission_classes = [IsVideoCreator]
+
+    def patch(self, request, pk):
+        video = get_object_or_404(Video, pk=pk)
+        self.check_object_permissions(request, video)
+        serializer = VideoUpdateSerializer(
+            video, data=request.data, context={"request": self.request}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class VideoView(APIView):
     def get(self, request):
         params = VideoQueryParamSerializer(data=request.query_params)
         params.is_valid(raise_exception=True)
@@ -180,7 +186,7 @@ class VideoView(APIView):
         videos = videos.order_by(
             "distance",
             "-creator__points",
-            "-created_at",
+            "-uploaded_at",
         )[:5]
         results = VideoResultsSerializer(videos, many=True)
         return Response(results.data, status=status.HTTP_200_OK)
