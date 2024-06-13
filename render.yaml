@@ -45,7 +45,7 @@ services:
 
 databases:
   - name: flitflok-db
-    plan: free
+    plan: starter
     region: ohio
     postgresMajorVersion: 14
     ipAllowList: [] # only allow internal connections
