@@ -5,6 +5,7 @@ import mux_python
 from django.contrib.gis.measure import D
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.html import strip_tags
 from firebase_admin import auth
 from rest_framework import serializers
@@ -120,7 +121,7 @@ class VideoUpdateSerializer(GeoFeatureModelSerializer):
             user.points += 10000
             user.save()
 
-        instance.uploaded_at = datetime.datetime.utcnow()
+        instance.uploaded_at = datetime.datetime.now(tz=timezone.utc)
         instance.save()
         return super().update(instance, validated_data)
 
