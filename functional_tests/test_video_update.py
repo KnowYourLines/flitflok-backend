@@ -20,6 +20,7 @@ class VideoUpdateTest(APITestCase):
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
                 },
+                "location_purpose": "Food & Drink",
             },
             format="json",
         )
@@ -33,6 +34,7 @@ class VideoUpdateTest(APITestCase):
             "properties": {
                 "place_name": "hello",
                 "address": "world",
+                "location_purpose": "Food & Drink",
             },
         }
         saved_video = Video.objects.get(id=video.id)
@@ -40,6 +42,7 @@ class VideoUpdateTest(APITestCase):
         assert saved_video.location.y == 51.51291201050047
         assert saved_video.place_name == "hello"
         assert saved_video.address == "world"
+        assert saved_video.location_purpose == "Food & Drink"
 
     def test_must_be_video_creator(self):
         user = User.objects.create(username="hello world")
