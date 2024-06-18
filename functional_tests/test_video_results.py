@@ -28,20 +28,6 @@ class VideoResultsTest(APITestCase):
                 format="json",
             )
         Video.objects.create(creator=user, playback_id="2")
-        with freeze_time("2012-01-14"):
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "place_name": "hello",
-                    "address": "world",
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.0333876462451904, 51.51291201050047],
-                    },
-                    "location_purpose": "Food & Drink",
-                },
-                format="json",
-            )
         current_latitude = 51.51291201050047
         current_longitude = -0.0333876462451904
         response = self.client.get(
