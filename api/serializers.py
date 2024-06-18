@@ -198,6 +198,9 @@ class VideoQueryParamSerializer(serializers.Serializer):
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
     current_video = serializers.UUIDField(required=False)
+    purpose = serializers.ChoiceField(
+        required=False, choices=Video.LOCATION_PURPOSE_CHOICES
+    )
 
     def validate_current_video(self, value):
         if not Video.objects.filter(id=value).exists():
@@ -225,6 +228,7 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "creator_rank",
             "display_name",
             "playback_id",
+            "location_purpose",
         )
 
     def get_posted_at(self, obj):

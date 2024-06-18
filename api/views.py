@@ -185,6 +185,8 @@ class VideoView(APIView):
                     current_video.location, current_location, spheroid=True
                 )
             )
+        if purpose := params.validated_data.get("purpose"):
+            videos = videos.filter(location_purpose=purpose)
         videos = videos.order_by(
             "distance",
             "-creator__points",

@@ -9,6 +9,73 @@ from api.models import User, Video
 
 
 class VideoResultsTest(APITestCase):
+    def test_filters_by_location_purpose(self):
+        user = User.objects.create(username="hello world")
+        self.client.force_authenticate(user=user)
+        video = Video.objects.create(creator=user, playback_id="1")
+        with freeze_time("2012-01-14"):
+            self.client.patch(
+                f"/video/{video.id}/",
+                {
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.0333876462451904, 51.51291201050047],
+                    },
+                    "location_purpose": "Food & Drink",
+                },
+                format="json",
+            )
+        Video.objects.create(creator=user, playback_id="2")
+        with freeze_time("2012-01-14"):
+            self.client.patch(
+                f"/video/{video.id}/",
+                {
+                    "place_name": "hello",
+                    "address": "world",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [-0.0333876462451904, 51.51291201050047],
+                    },
+                    "location_purpose": "Food & Drink",
+                },
+                format="json",
+            )
+        current_latitude = 51.51291201050047
+        current_longitude = -0.0333876462451904
+        response = self.client.get(
+            f"/video/?latitude={current_latitude}&longitude={current_longitude}&purpose="
+            f"Food%20%26%20Drink"
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.data == {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": str(Video.objects.get(place_name="hello").id),
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.03338764624519, 51.51291201050047],
+                    },
+                    "properties": {
+                        "place_name": "hello",
+                        "address": "world",
+                        "distance": "0.0 km",
+                        "posted_at": datetime.datetime(
+                            2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
+                        ).timestamp(),
+                        "creator": "hello world",
+                        "creator_rank": 1,
+                        "display_name": None,
+                        "playback_id": "1",
+                        "location_purpose": "Food & Drink",
+                    },
+                },
+            ],
+        }
+
     def test_omits_videos_without_playback_id(self):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
@@ -55,6 +122,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "1",
+                        "location_purpose": "",
                     },
                 },
             ],
@@ -148,6 +216,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "1",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -168,6 +237,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "4",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -188,6 +258,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "2",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -208,6 +279,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 2,
                         "display_name": None,
                         "playback_id": "3",
+                        "location_purpose": "",
                     },
                 },
             ],
@@ -271,6 +343,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "1",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -291,6 +364,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "2",
+                        "location_purpose": "",
                     },
                 },
             ],
@@ -363,6 +437,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "5",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -383,6 +458,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "3",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -403,6 +479,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "4",
+                        "location_purpose": "",
                     },
                 },
             ],
@@ -441,6 +518,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "1",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -461,6 +539,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "2",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -481,6 +560,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "5",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -501,6 +581,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "3",
+                        "location_purpose": "",
                     },
                 },
                 {
@@ -521,6 +602,7 @@ class VideoResultsTest(APITestCase):
                         "creator_rank": 1,
                         "display_name": None,
                         "playback_id": "4",
+                        "location_purpose": "",
                     },
                 },
             ],

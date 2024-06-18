@@ -11,7 +11,7 @@ from api.permissions import IsFromMux
 
 class MuxWebhookTest(APITestCase):
     def test_requires_valid_header(self):
-        with freeze_time("2024-06-10 22:24:02"):
+        with freeze_time("2024-06-18 01:00:01"):
             response = self.client.post(
                 "/mux-webhook/",
                 {
@@ -19,31 +19,30 @@ class MuxWebhookTest(APITestCase):
                     "request_id": None,
                     "object": {
                         "type": "upload",
-                        "id": "602229EJsGGo8epvgmH8qMsAjDLammVK4CgHnP8Pnvpo",
+                        "id": "KpNcCsdF01TwFgu900HwAXO3i9ARlbskMvdNFcKVyg6kA",
                     },
-                    "id": "0ef554a6-b138-1484-2713-809fee24a001",
-                    "environment": {"name": "Production", "id": "55g0gl"},
+                    "id": "7c92e422-8ab7-c990-e06c-443a05ccfddc",
+                    "environment": {"name": "Development", "id": "0rgfa0"},
                     "data": {
                         "timeout": 3600,
                         "status": "asset_created",
                         "new_asset_settings": {
                             "playback_policies": ["public"],
-                            "passthrough": "hello world",
                             "max_resolution_tier": "1080p",
                             "encoding_tier": "baseline",
                         },
-                        "id": "602229EJsGGo8epvgmH8qMsAjDLammVK4CgHnP8Pnvpo",
+                        "id": "KpNcCsdF01TwFgu900HwAXO3i9ARlbskMvdNFcKVyg6kA",
                         "cors_origin": "*",
-                        "asset_id": "nIBvNd01huS4qQFB7tL76L2xALOc01nzH4TQsUmV8n7ys",
+                        "asset_id": "019zhka83AeVNfAxSGJjtwf5j3Yfj800s4oAvvjhZm3t4",
                     },
-                    "created_at": "2024-06-10T22:24:01.561000Z",
+                    "created_at": "2024-06-18T01:00:01.378000Z",
                     "attempts": [],
                     "accessor_source": None,
                     "accessor": None,
                 },
                 format="json",
                 headers={
-                    "Mux-Signature": "t=1718058242,v1=d6a4b3e3a83320b9af87d8717e2cf0700ec246416750c2ac27e5bc0987b19cf6"
+                    "Mux-Signature": "t=1718672401,v1=7d61e4e46e549bcc6d49f496c6d3a265a0d81f62ff18147c119eeea5fa19f6f0"
                 },
             )
         assert response.status_code == HTTPStatus.OK
