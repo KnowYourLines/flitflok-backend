@@ -1,9 +1,6 @@
-import logging
-
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
-from django.db.models import Count, F, Window
-from django.db.models.functions import DenseRank
+from django.db.models import Count
 from firebase_admin.auth import delete_user
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
