@@ -171,12 +171,6 @@ class VideoView(APIView):
             .exclude(playback_id__exact="")
             .annotate(distance=Distance("location", current_location, spheroid=True))
             .annotate(number_directions_requests=Count("directions_requested_by"))
-            .annotate(
-                creator_rank=Window(
-                    expression=DenseRank(),
-                    order_by=F("creator__points").desc(),
-                )
-            )
         )
         if current_video_id := params.validated_data.get("current_video"):
             current_video = Video.objects.get(id=current_video_id)

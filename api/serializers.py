@@ -238,7 +238,9 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
         return f"{round(obj.distance.km, 1)} km"
 
     def get_creator_rank(self, obj):
-        return obj.creator_rank
+        user_points = obj.creator.points
+        num_users_ranked_above = User.objects.filter(points__gt=user_points).count()
+        return num_users_ranked_above + 1
 
 
 class VideosBlockedSerializer(serializers.ModelSerializer):

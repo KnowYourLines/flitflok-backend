@@ -145,6 +145,7 @@ class VideoResultsTest(APITestCase):
                 },
                 format="json",
             )
+        User.objects.create(username="best explorer", points=1000000000000000)
         user2 = User.objects.create(username="goodbye world")
         self.client.force_authenticate(user=user2)
         with freeze_time("2023-01-14"):
@@ -199,7 +200,7 @@ class VideoResultsTest(APITestCase):
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
-                        "creator_rank": 1,
+                        "creator_rank": 2,
                         "display_name": None,
                         "playback_id": "1",
                         "location_purpose": "",
@@ -220,7 +221,7 @@ class VideoResultsTest(APITestCase):
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
-                        "creator_rank": 1,
+                        "creator_rank": 2,
                         "display_name": None,
                         "playback_id": "4",
                         "location_purpose": "",
@@ -241,7 +242,7 @@ class VideoResultsTest(APITestCase):
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "hello world",
-                        "creator_rank": 1,
+                        "creator_rank": 2,
                         "display_name": None,
                         "playback_id": "2",
                         "location_purpose": "",
@@ -262,7 +263,7 @@ class VideoResultsTest(APITestCase):
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
                         "creator": "goodbye world",
-                        "creator_rank": 2,
+                        "creator_rank": 3,
                         "display_name": None,
                         "playback_id": "3",
                         "location_purpose": "",
