@@ -1,6 +1,5 @@
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
-from django.db.models import Count
 from firebase_admin.auth import delete_user
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
@@ -167,7 +166,6 @@ class VideoView(APIView):
             .exclude(playback_id__isnull=True)
             .exclude(playback_id__exact="")
             .annotate(distance=Distance("location", current_location, spheroid=True))
-            .annotate(number_directions_requests=Count("directions_requested_by"))
         )
         if current_video_id := params.validated_data.get("current_video"):
             current_video = Video.objects.get(id=current_video_id)
