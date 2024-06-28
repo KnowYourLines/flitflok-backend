@@ -18,8 +18,6 @@ class VideoActionsTest(APITestCase):
         self.client.patch(
             f"/video/{video.id}/",
             {
-                "place_name": "hello",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.011591, 51.491857],
@@ -57,8 +55,6 @@ class VideoActionsTest(APITestCase):
         self.client.patch(
             f"/video/{video.id}/",
             {
-                "place_name": "hello",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -108,8 +104,6 @@ class VideoActionsTest(APITestCase):
         self.client.patch(
             f"/video/{video.id}/",
             {
-                "place_name": "hello",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -129,7 +123,7 @@ class VideoActionsTest(APITestCase):
         )
         assert response.status_code == HTTPStatus.NO_CONTENT
         assert not response.data
-        reported_video = Video.objects.get(place_name="hello")
+        reported_video = Video.objects.get(playback_id="1")
         assert reported_video.hidden_from.all().first() == user
         response = self.client.get(
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
@@ -153,8 +147,6 @@ class VideoActionsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -167,8 +159,6 @@ class VideoActionsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello2",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -216,8 +206,6 @@ class VideoActionsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -230,8 +218,6 @@ class VideoActionsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello2",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.0333876462451904, 51.51291201050047],

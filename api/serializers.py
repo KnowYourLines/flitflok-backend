@@ -110,7 +110,7 @@ class VideoUpdateSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Video
         geo_field = "location"
-        fields = ("place_name", "address", "location_purpose")
+        fields = ["location_purpose"]
 
     def update(self, instance, validated_data):
         user = self.context["request"].user
@@ -220,8 +220,6 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
         geo_field = "location"
         fields = (
             "id",
-            "place_name",
-            "address",
             "distance",
             "posted_at",
             "creator",

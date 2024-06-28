@@ -17,8 +17,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -39,15 +37,13 @@ class VideoResultsTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(place_name="hello").id),
+                    "id": str(Video.objects.get(playback_id="1").id),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.03338764624519, 51.51291201050047],
                     },
                     "properties": {
-                        "place_name": "hello",
-                        "address": "world",
                         "distance": "0.0 km",
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -70,8 +66,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -91,15 +85,13 @@ class VideoResultsTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(place_name="hello").id),
+                    "id": str(Video.objects.get(playback_id="1").id),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.03338764624519, 51.51291201050047],
                     },
                     "properties": {
-                        "place_name": "hello",
-                        "address": "world",
                         "distance": "0.0 km",
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -122,8 +114,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -136,8 +126,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello2",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -153,8 +141,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello3",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -168,8 +154,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello4",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -186,15 +170,13 @@ class VideoResultsTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(place_name="hello").id),
+                    "id": str(Video.objects.get(playback_id="1").id),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.03338764624519, 51.51291201050047],
                     },
                     "properties": {
-                        "place_name": "hello",
-                        "address": "world",
                         "distance": "0.0 km",
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -208,14 +190,12 @@ class VideoResultsTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(place_name="hello4").id),
+                    "id": str(Video.objects.get(playback_id="4").id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
                     },
                     "properties": {
-                        "place_name": "hello4",
-                        "address": "world",
                         "distance": "2.8 km",
                         "posted_at": datetime.datetime(
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -229,14 +209,12 @@ class VideoResultsTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(place_name="hello2").id),
+                    "id": str(Video.objects.get(playback_id="2").id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
                     },
                     "properties": {
-                        "place_name": "hello2",
-                        "address": "world",
                         "distance": "2.8 km",
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -250,14 +228,12 @@ class VideoResultsTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(place_name="hello3").id),
+                    "id": str(Video.objects.get(playback_id="3").id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
                     },
                     "properties": {
-                        "place_name": "hello3",
-                        "address": "world",
                         "distance": "2.8 km",
                         "posted_at": datetime.datetime(
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -280,8 +256,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -294,8 +268,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello2",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -313,15 +285,13 @@ class VideoResultsTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(place_name="hello").id),
+                    "id": str(Video.objects.get(playback_id="1").id),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.03338764624519, 51.51291201050047],
                     },
                     "properties": {
-                        "place_name": "hello",
-                        "address": "world",
                         "distance": "0.0 km",
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -335,14 +305,12 @@ class VideoResultsTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(place_name="hello2").id),
+                    "id": str(Video.objects.get(playback_id="2").id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
                     },
                     "properties": {
-                        "place_name": "hello2",
-                        "address": "world",
                         "distance": "2.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -361,8 +329,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello3",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.335827, 53.767750],
@@ -375,8 +341,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello4",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-3.188267, 55.953251],
@@ -389,8 +353,6 @@ class VideoResultsTest(APITestCase):
             self.client.patch(
                 f"/video/{video.id}/",
                 {
-                    "place_name": "hello5",
-                    "address": "world",
                     "location": {
                         "type": "Point",
                         "coordinates": [-0.335827, 53.767750],
@@ -408,14 +370,12 @@ class VideoResultsTest(APITestCase):
             "features": [
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(place_name="hello5").id),
+                    "id": str(Video.objects.get(playback_id="5").id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.335827, 53.767750],
                     },
                     "properties": {
-                        "place_name": "hello5",
-                        "address": "world",
                         "distance": "251.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
@@ -428,15 +388,13 @@ class VideoResultsTest(APITestCase):
                     },
                 },
                 {
-                    "id": str(Video.objects.get(place_name="hello3").id),
+                    "id": str(Video.objects.get(playback_id="3").id),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.335827, 53.767750],
                     },
                     "properties": {
-                        "place_name": "hello3",
-                        "address": "world",
                         "distance": "251.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -450,14 +408,12 @@ class VideoResultsTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(place_name="hello4").id),
+                    "id": str(Video.objects.get(playback_id="4").id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-3.188267, 55.953251],
                     },
                     "properties": {
-                        "place_name": "hello4",
-                        "address": "world",
                         "distance": "536.1 km",
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -488,15 +444,13 @@ class VideoResultsTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(place_name="hello").id),
+                    "id": str(Video.objects.get(playback_id="1").id),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.03338764624519, 51.51291201050047],
                     },
                     "properties": {
-                        "place_name": "hello",
-                        "address": "world",
                         "distance": "0.0 km",
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -510,14 +464,12 @@ class VideoResultsTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(place_name="hello2").id),
+                    "id": str(Video.objects.get(playback_id="2").id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
                     },
                     "properties": {
-                        "place_name": "hello2",
-                        "address": "world",
                         "distance": "2.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -531,14 +483,12 @@ class VideoResultsTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(place_name="hello5").id),
+                    "id": str(Video.objects.get(playback_id="5").id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.335827, 53.767750],
                     },
                     "properties": {
-                        "place_name": "hello5",
-                        "address": "world",
                         "distance": "251.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
@@ -551,15 +501,13 @@ class VideoResultsTest(APITestCase):
                     },
                 },
                 {
-                    "id": str(Video.objects.get(place_name="hello3").id),
+                    "id": str(Video.objects.get(playback_id="3").id),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.335827, 53.767750],
                     },
                     "properties": {
-                        "place_name": "hello3",
-                        "address": "world",
                         "distance": "251.8 km",
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
@@ -573,14 +521,12 @@ class VideoResultsTest(APITestCase):
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(place_name="hello4").id),
+                    "id": str(Video.objects.get(playback_id="4").id),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-3.188267, 55.953251],
                     },
                     "properties": {
-                        "place_name": "hello4",
-                        "address": "world",
                         "distance": "536.1 km",
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc

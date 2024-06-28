@@ -14,8 +14,6 @@ class VideoUpdateTest(APITestCase):
         response = self.client.patch(
             f"/video/{video.id}/",
             {
-                "place_name": "hello",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -32,16 +30,12 @@ class VideoUpdateTest(APITestCase):
                 "coordinates": [-0.03338764624519, 51.51291201050047],
             },
             "properties": {
-                "place_name": "hello",
-                "address": "world",
                 "location_purpose": "Food & Drink",
             },
         }
         saved_video = Video.objects.get(id=video.id)
         assert saved_video.location.x == -0.0333876462451904
         assert saved_video.location.y == 51.51291201050047
-        assert saved_video.place_name == "hello"
-        assert saved_video.address == "world"
         assert saved_video.location_purpose == "Food & Drink"
 
     def test_must_be_video_creator(self):
@@ -52,8 +46,6 @@ class VideoUpdateTest(APITestCase):
         response = self.client.patch(
             f"/video/{video.id}/",
             {
-                "place_name": "hello",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],

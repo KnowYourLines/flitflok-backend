@@ -28,8 +28,6 @@ class Video(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     uploaded_at = models.DateTimeField(null=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    place_name = models.TextField(blank=True)
-    address = models.TextField(blank=True)
     location = models.PointField(null=True)
     playback_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
     asset_id = models.CharField(max_length=255, blank=True, null=True, unique=True)

@@ -21,8 +21,6 @@ class UserRankingTest(APITestCase):
         self.client.patch(
             f"/video/{video.id}/",
             {
-                "place_name": "hello",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],

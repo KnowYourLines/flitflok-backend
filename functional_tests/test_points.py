@@ -16,8 +16,6 @@ class PointsTest(APITestCase):
         self.client.patch(
             f"/video/{video.id}/",
             {
-                "place_name": "hello",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -29,8 +27,6 @@ class PointsTest(APITestCase):
         self.client.patch(
             f"/video/{video.id}/",
             {
-                "place_name": "hello",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -47,8 +43,6 @@ class PointsTest(APITestCase):
         self.client.patch(
             f"/video/{video.id}/",
             {
-                "place_name": "hello",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -64,8 +58,6 @@ class PointsTest(APITestCase):
         self.client.patch(
             f"/video/{video2.id}/",
             {
-                "place_name": "hello2",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -84,8 +76,6 @@ class PointsTest(APITestCase):
         self.client.patch(
             f"/video/{video3.id}/",
             {
-                "place_name": "hello3",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
@@ -97,8 +87,6 @@ class PointsTest(APITestCase):
         self.client.patch(
             f"/video/{video4.id}/",
             {
-                "place_name": "hello4",
-                "address": "world",
                 "location": {
                     "type": "Point",
                     "coordinates": [-0.0333876462451904, 51.51291201050047],
