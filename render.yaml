@@ -36,11 +36,9 @@ services:
         sync: false
       - key: EMAIL_HOST_PASSWORD
         sync: false
-      - key: MUX_TOKEN_ID
+      - key: CLOUDFLARE_ACCOUNT_ID
         sync: false
-      - key: MUX_TOKEN_SECRET
-        sync: false
-      - key: MUX_SIGNING_SECRET
+      - key: CLOUDFLARE_API_TOKEN
         sync: false
 
 databases:

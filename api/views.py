@@ -45,7 +45,15 @@ class VideoUploadView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        return Response(
+            None,
+            headers={
+                "Access-Control-Expose-Headers": "Location",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Location": serializer.data["location"],
+            },
+        )
 
 
 class DisplayNameView(APIView):

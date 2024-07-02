@@ -6,17 +6,20 @@ from http import HTTPStatus
 
 
 class VideoUploadTest(APITestCase):
-    def test_get_upload_url(self):
+    def test_gets_upload_response(self):
         user = User.objects.create(username="zVAvUkRbSbgZCSnZ64hU9PyutCi1")
         self.client.force_authenticate(user=user)
         response = self.client.get(
             "/video-upload/",
         )
         assert response.status_code == HTTPStatus.OK
-        assert response.data["properties"]["url"].startswith(
-            "https://storage.googleapis.com/video-storage-gcp"
+        assert not response.data
+        assert response.headers["Access-Control-Allow-Headers"] == "*"
+        assert response.headers["Access-Control-Allow-Origin"] == "*"
+        assert response.headers["Access-Control-Expose-Headers"] == "Location"
+        assert response.headers["Location"].startswith(
+            "https://upload.videodelivery.net/tus/"
         )
-        assert Video.objects.get(id=response.data["properties"]["passthrough"])
 
     def test_must_be_verified_to_upload(self):
         firebase_user = auth.create_user()

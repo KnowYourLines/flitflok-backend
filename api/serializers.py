@@ -1,7 +1,8 @@
+import base64
 import datetime
 import os
 
-import mux_python
+import requests
 from django.contrib.gis.measure import D
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -67,36 +68,28 @@ class DisplayNameSerializer(serializers.ModelSerializer):
         fields = ["display_name"]
 
 
-class VideoUploadSerializer(GeoFeatureModelSerializer):
+class VideoUploadSerializer(serializers.Serializer):
     creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    url = serializers.URLField(read_only=True)
-    passthrough = serializers.UUIDField(read_only=True)
-
-    class Meta:
-        model = Video
-        geo_field = "location"
-        fields = ["creator", "url", "passthrough"]
+    location = serializers.URLField(read_only=True)
 
     def create(self, validated_data):
-        new_video = super().create(validated_data)
-        configuration = mux_python.Configuration()
-        configuration.username = os.environ["MUX_TOKEN_ID"]
-        configuration.password = os.environ["MUX_TOKEN_SECRET"]
-        uploads_api = mux_python.DirectUploadsApi(mux_python.ApiClient(configuration))
-        create_asset_request = mux_python.CreateAssetRequest(
-            passthrough=str(new_video.id),
-            playback_policy=[mux_python.PlaybackPolicy.PUBLIC],
-            encoding_tier="baseline",
+        endpoint = f"https://api.cloudflare.com/client/v4/accounts/{os.environ.get('CLOUDFLARE_ACCOUNT_ID')}/stream?direct_user=true"
+        max_duration = base64.b64encode(b"30").decode("utf-8")
+        expiry = base64.b64encode(
+            (datetime.datetime.utcnow() + datetime.timedelta(days=1))
+            .strftime("%Y-%m-%dT%H:%M:%SZ")
+            .encode()
         )
-        create_upload_request = mux_python.CreateUploadRequest(
-            timeout=3600, new_asset_settings=create_asset_request, cors_origin="*"
-        )
-        create_upload_response = uploads_api.create_direct_upload(
-            create_upload_request
-        ).data
+        headers = {
+            "Authorization": f"bearer {os.environ.get('CLOUDFLARE_API_TOKEN')}",
+            "Tus-Resumable": "1.0.0",
+            "Upload-Length": "1",
+            "Upload-Metadata": f"maxDurationSeconds {max_duration}, expiry {expiry}",
+        }
+
+        response = requests.request("POST", endpoint, headers=headers)
         return {
-            "url": create_upload_response.url,
-            "passthrough": create_upload_response.new_asset_settings.passthrough,
+            "location": response.headers.get("Location"),
         }
 
     def validate_creator(self, creator):
