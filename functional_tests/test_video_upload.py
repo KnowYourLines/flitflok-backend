@@ -1,3 +1,6 @@
+import os
+
+import requests
 from firebase_admin import auth
 from rest_framework.test import APITestCase
 
@@ -13,7 +16,7 @@ class VideoUploadTest(APITestCase):
             "/video-upload/",
             headers={
                 "Upload-Length": "1690691",
-                "Upload-Metadata": "purpose Rm9vZCAmIERyaW5r,latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+                "Upload-Metadata": "purpose dGVzdA==,latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
             },
         )
         assert response.status_code == HTTPStatus.OK
@@ -24,6 +27,15 @@ class VideoUploadTest(APITestCase):
         assert response.headers["Location"].startswith(
             "https://upload.videodelivery.net/tus/"
         )
+        url = f"https://api.cloudflare.com/client/v4/accounts/{os.environ.get('CLOUDFLARE_ACCOUNT_ID')}/stream?purpose=test"
+        headers = {
+            "Authorization": f"bearer {os.environ.get('CLOUDFLARE_API_TOKEN')}",
+        }
+        response = requests.request("GET", url, headers=headers)
+        videos = response.json()["result"]
+        for video in videos:
+            url = f"https://api.cloudflare.com/client/v4/accounts/{os.environ.get('CLOUDFLARE_ACCOUNT_ID')}/stream/{video['uid']}"
+            requests.request("DELETE", url, headers=headers)
 
     def test_must_be_verified_to_upload(self):
         firebase_user = auth.create_user()
