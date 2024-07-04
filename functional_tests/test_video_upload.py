@@ -4,12 +4,12 @@ import requests
 from firebase_admin import auth
 from rest_framework.test import APITestCase
 
-from api.models import User, Video
+from api.models import User
 from http import HTTPStatus
 
 
 class VideoUploadTest(APITestCase):
-    def test_gets_upload_response(self):
+    def test_gets_upload_location(self):
         user = User.objects.create(username="zVAvUkRbSbgZCSnZ64hU9PyutCi1")
         self.client.force_authenticate(user=user)
         response = self.client.post(
@@ -60,7 +60,10 @@ class VideoUploadTest(APITestCase):
             },
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.data[0] == "Upload length must be a positive integer"
+        assert (
+            response.data["non_field_errors"][0]
+            == "Upload length must be a positive integer"
+        )
 
     def test_upload_metadata_cannot_define_max_duration(self):
         user = User.objects.create(username="zVAvUkRbSbgZCSnZ64hU9PyutCi1")
@@ -73,7 +76,10 @@ class VideoUploadTest(APITestCase):
             },
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.data[0] == "Max upload duration cannot be user defined"
+        assert (
+            response.data["non_field_errors"][0]
+            == "Max upload duration cannot be user defined"
+        )
 
     def test_upload_metadata_cannot_define_expiry(self):
         user = User.objects.create(username="zVAvUkRbSbgZCSnZ64hU9PyutCi1")
@@ -86,4 +92,7 @@ class VideoUploadTest(APITestCase):
             },
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
-        assert response.data[0] == "Upload expiry cannot be user defined"
+        assert (
+            response.data["non_field_errors"][0]
+            == "Upload expiry cannot be user defined"
+        )

@@ -83,17 +83,6 @@ class VideoUploadSerializer(serializers.Serializer):
         firebase_uid = base64.b64encode(
             self.context["request"].user.username.encode()
         ).decode("utf-8")
-        metadata = self.context["request"].headers["Upload-Metadata"]
-        if "maxDurationSeconds" in metadata:
-            raise serializers.ValidationError(
-                "Max upload duration cannot be user defined"
-            )
-        if "expiry" in metadata:
-            raise serializers.ValidationError("Upload expiry cannot be user defined")
-        if int(self.context["request"].headers["Upload-Length"]) < 1:
-            raise serializers.ValidationError(
-                "Upload length must be a positive integer"
-            )
         headers = {
             "Authorization": f"bearer {os.environ.get('CLOUDFLARE_API_TOKEN')}",
             "Tus-Resumable": "1.0.0",
@@ -106,6 +95,20 @@ class VideoUploadSerializer(serializers.Serializer):
         return {
             "location": response.headers.get("Location"),
         }
+
+    def validate(self, data):
+        metadata = self.context["request"].headers["Upload-Metadata"]
+        if "maxDurationSeconds" in metadata:
+            raise serializers.ValidationError(
+                "Max upload duration cannot be user defined"
+            )
+        if "expiry" in metadata:
+            raise serializers.ValidationError("Upload expiry cannot be user defined")
+        if int(self.context["request"].headers["Upload-Length"]) < 1:
+            raise serializers.ValidationError(
+                "Upload length must be a positive integer"
+            )
+        return data
 
     def validate_creator(self, creator):
         user = auth.get_user(creator.username)
