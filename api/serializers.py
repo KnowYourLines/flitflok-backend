@@ -83,7 +83,7 @@ class VideoUploadSerializer(serializers.Serializer):
         headers = {
             "Authorization": f"bearer {os.environ.get('CLOUDFLARE_API_TOKEN')}",
             "Tus-Resumable": "1.0.0",
-            "Upload-Length": f"{300 * 1024 * 1024}",
+            "Upload-Length": self.context["request"].headers["Upload-Length"],
             "Upload-Metadata": f"maxDurationSeconds {max_duration}, expiry {expiry}",
         }
 

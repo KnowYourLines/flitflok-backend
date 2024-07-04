@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from firebase_admin.auth import delete_user
@@ -24,6 +26,8 @@ from api.serializers import (
     WebhookEventSerializer,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class MuxWebhookView(APIView):
     authentication_classes = []
@@ -39,7 +43,7 @@ class MuxWebhookView(APIView):
 
 
 class VideoUploadView(APIView):
-    def get(self, request):
+    def post(self, request):
         serializer = VideoUploadSerializer(
             data=request.data, context={"request": self.request}
         )

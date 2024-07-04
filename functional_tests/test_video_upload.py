@@ -9,8 +9,11 @@ class VideoUploadTest(APITestCase):
     def test_gets_upload_response(self):
         user = User.objects.create(username="zVAvUkRbSbgZCSnZ64hU9PyutCi1")
         self.client.force_authenticate(user=user)
-        response = self.client.get(
+        response = self.client.post(
             "/video-upload/",
+            headers={
+                "Upload-Length": "1690691",
+            },
         )
         assert response.status_code == HTTPStatus.OK
         assert not response.data
@@ -26,7 +29,7 @@ class VideoUploadTest(APITestCase):
         uid = firebase_user.uid
         user = User.objects.create(username=uid)
         self.client.force_authenticate(user=user)
-        response = self.client.get(
+        response = self.client.post(
             "/video-upload/",
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
