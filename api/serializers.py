@@ -80,6 +80,9 @@ class VideoUploadSerializer(serializers.Serializer):
             .strftime("%Y-%m-%dT%H:%M:%SZ")
             .encode()
         ).decode("utf-8")
+        firebase_uid = base64.b64encode(
+            self.context["request"].user.username.encode()
+        ).decode("utf-8")
         metadata = self.context["request"].headers["Upload-Metadata"]
         if "maxDurationSeconds" in metadata:
             raise serializers.ValidationError(
@@ -95,7 +98,7 @@ class VideoUploadSerializer(serializers.Serializer):
             "Authorization": f"bearer {os.environ.get('CLOUDFLARE_API_TOKEN')}",
             "Tus-Resumable": "1.0.0",
             "Upload-Length": self.context["request"].headers["Upload-Length"],
-            "Upload-Metadata": f"maxDurationSeconds {max_duration}, expiry {expiry}, "
+            "Upload-Metadata": f"maxDurationSeconds {max_duration}, expiry {expiry}, firebase_uid {firebase_uid}, "
             + self.context["request"].headers["Upload-Metadata"],
         }
 
