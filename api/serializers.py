@@ -79,12 +79,24 @@ class VideoUploadSerializer(serializers.Serializer):
             (datetime.datetime.utcnow() + datetime.timedelta(days=1))
             .strftime("%Y-%m-%dT%H:%M:%SZ")
             .encode()
-        )
+        ).decode("utf-8")
+        metadata = self.context["request"].headers["Upload-Metadata"]
+        if "maxDurationSeconds" in metadata:
+            raise serializers.ValidationError(
+                "Max upload duration cannot be user defined"
+            )
+        if "expiry" in metadata:
+            raise serializers.ValidationError("Upload expiry cannot be user defined")
+        if int(self.context["request"].headers["Upload-Length"]) < 1:
+            raise serializers.ValidationError(
+                "Upload length must be a positive integer"
+            )
         headers = {
             "Authorization": f"bearer {os.environ.get('CLOUDFLARE_API_TOKEN')}",
             "Tus-Resumable": "1.0.0",
             "Upload-Length": self.context["request"].headers["Upload-Length"],
-            "Upload-Metadata": f"maxDurationSeconds {max_duration}, expiry {expiry}",
+            "Upload-Metadata": f"maxDurationSeconds {max_duration}, expiry {expiry}, "
+            + self.context["request"].headers["Upload-Metadata"],
         }
 
         response = requests.request("POST", endpoint, headers=headers)

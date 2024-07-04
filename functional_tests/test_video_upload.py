@@ -13,6 +13,7 @@ class VideoUploadTest(APITestCase):
             "/video-upload/",
             headers={
                 "Upload-Length": "1690691",
+                "Upload-Metadata": "purpose Rm9vZCAmIERyaW5r,latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
             },
         )
         assert response.status_code == HTTPStatus.OK
@@ -35,3 +36,42 @@ class VideoUploadTest(APITestCase):
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert response.data["creator"][0] == "Verified email address required"
         auth.delete_user(uid)
+
+    def test_upload_length_must_be_positive_integer(self):
+        user = User.objects.create(username="zVAvUkRbSbgZCSnZ64hU9PyutCi1")
+        self.client.force_authenticate(user=user)
+        response = self.client.post(
+            "/video-upload/",
+            headers={
+                "Upload-Length": "-34534534",
+                "Upload-Metadata": "purpose Rm9vZCAmIERyaW5r,latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+            },
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.data[0] == "Upload length must be a positive integer"
+
+    def test_upload_metadata_cannot_define_max_duration(self):
+        user = User.objects.create(username="zVAvUkRbSbgZCSnZ64hU9PyutCi1")
+        self.client.force_authenticate(user=user)
+        response = self.client.post(
+            "/video-upload/",
+            headers={
+                "Upload-Length": "34534534",
+                "Upload-Metadata": "maxDurationSeconds NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+            },
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.data[0] == "Max upload duration cannot be user defined"
+
+    def test_upload_metadata_cannot_define_expiry(self):
+        user = User.objects.create(username="zVAvUkRbSbgZCSnZ64hU9PyutCi1")
+        self.client.force_authenticate(user=user)
+        response = self.client.post(
+            "/video-upload/",
+            headers={
+                "Upload-Length": "34534534",
+                "Upload-Metadata": "expiry NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+            },
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.data[0] == "Upload expiry cannot be user defined"
