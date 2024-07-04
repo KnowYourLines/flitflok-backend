@@ -16,7 +16,7 @@ class VideoUploadTest(APITestCase):
             "/video-upload/",
             headers={
                 "Upload-Length": "1690691",
-                "Upload-Metadata": "purpose dGVzdA==,latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+                "Upload-Metadata": "name dGVzdA==, purpose dGVzdA==,latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
             },
         )
         assert response.status_code == HTTPStatus.OK
@@ -27,7 +27,7 @@ class VideoUploadTest(APITestCase):
         assert response.headers["Location"].startswith(
             "https://upload.videodelivery.net/tus/"
         )
-        url = f"https://api.cloudflare.com/client/v4/accounts/{os.environ.get('CLOUDFLARE_ACCOUNT_ID')}/stream?purpose=test"
+        url = f"https://api.cloudflare.com/client/v4/accounts/{os.environ.get('CLOUDFLARE_ACCOUNT_ID')}/stream?search=test"
         headers = {
             "Authorization": f"bearer {os.environ.get('CLOUDFLARE_API_TOKEN')}",
         }
