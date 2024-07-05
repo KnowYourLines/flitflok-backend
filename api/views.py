@@ -9,10 +9,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models import Video
-from api.permissions import IsFromCloudflare, IsVideoCreator
+from api.permissions import IsFromCloudflare
 from api.serializers import (
     UserSerializer,
-    VideoUpdateSerializer,
     VideoQueryParamSerializer,
     VideoResultsSerializer,
     VideoHideSerializer,
@@ -148,20 +147,6 @@ class VideoBlockView(APIView):
             video.creator.video_set.all().order_by("-uploaded_at"), many=True
         )
         return Response(blocked_videos.data, status=status.HTTP_200_OK)
-
-
-class VideoUpdateView(APIView):
-    permission_classes = [IsVideoCreator]
-
-    def patch(self, request, pk):
-        video = get_object_or_404(Video, pk=pk)
-        self.check_object_permissions(request, video)
-        serializer = VideoUpdateSerializer(
-            video, data=request.data, context={"request": self.request}
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class VideoView(APIView):

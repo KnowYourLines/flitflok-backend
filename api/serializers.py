@@ -7,7 +7,6 @@ from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.utils import timezone
 from django.utils.html import strip_tags
 from firebase_admin import auth
 from rest_framework import serializers
@@ -137,26 +136,6 @@ class VideoUploadSerializer(serializers.Serializer):
         if not user.email_verified:
             raise serializers.ValidationError("Verified email address required")
         return creator
-
-
-class VideoUpdateSerializer(GeoFeatureModelSerializer):
-    class Meta:
-        model = Video
-        geo_field = "location"
-        fields = ["location_purpose"]
-
-    def update(self, instance, validated_data):
-        user = self.context["request"].user
-        new_location = validated_data["location"]
-        if not Video.objects.filter(
-            location__distance_lte=(new_location, D(mi=1))
-        ).exists():
-            user.points += 10000
-            user.save()
-
-        instance.uploaded_at = datetime.datetime.now(tz=timezone.utc)
-        instance.save()
-        return super().update(instance, validated_data)
 
 
 class VideoBlockSerializer(serializers.Serializer):

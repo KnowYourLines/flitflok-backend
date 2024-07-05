@@ -23,8 +23,3 @@ class IsFromCloudflare(permissions.BasePermission):
         signature = digest.hexdigest()
         valid_signature = expected_signature == signature
         return valid_signature
-
-
-class IsVideoCreator(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return obj.creator == request.user
