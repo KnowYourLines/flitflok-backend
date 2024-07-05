@@ -3,6 +3,7 @@ import datetime
 import os
 
 import requests
+from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -19,28 +20,49 @@ class PlaybackIdSerializer(serializers.Serializer):
     id = serializers.CharField()
 
 
-class VideoReadyDataSerializer(serializers.Serializer):
-    playback_ids = serializers.ListField(child=PlaybackIdSerializer(), required=False)
-    passthrough = serializers.CharField(required=False)
-    id = serializers.CharField(required=False)
+class PlaybackSerializer(serializers.Serializer):
+    hls = serializers.URLField()
+
+
+class MetaSerializer(serializers.Serializer):
+    firebase_uid = serializers.CharField()
+    latitude = serializers.CharField()
+    longitude = serializers.CharField()
+    purpose = serializers.ChoiceField(
+        choices=Video.LOCATION_PURPOSE_CHOICES, required=False
+    )
 
 
 class WebhookEventSerializer(serializers.Serializer):
-    type = serializers.CharField()
-    data = VideoReadyDataSerializer(required=False)
+    readyToStream = serializers.BooleanField()
+    readyToStreamAt = serializers.DateTimeField()
+    playback = PlaybackSerializer()
+    thumbnail = serializers.URLField()
+    preview = serializers.URLField()
+    uid = serializers.CharField()
+    meta = MetaSerializer()
 
     def save(self):
-        event_type = self.validated_data["type"]
-        if event_type == "video.asset.ready":
-            data = self.validated_data.get("data", {})
-            playback_ids = data.get("playback_ids", [])
-            passthrough = data.get("passthrough", "")
-            asset_id = data.get("id")
-            video = Video.objects.get(id=passthrough)
-            playback_id = playback_ids[0]["id"]
-            video.playback_id = playback_id
-            video.asset_id = asset_id
-            video.save()
+        ready = self.validated_data["readyToStream"]
+        if ready:
+            Video.objects.update_or_create(
+                cloudflare_uid=self.validated_data["uid"],
+                defaults={
+                    "creator": User.objects.get(
+                        username=self.validated_data["meta"]["firebase_uid"]
+                    ),
+                    "location": Point(
+                        float(self.validated_data["meta"]["longitude"]),
+                        float(self.validated_data["meta"]["latitude"]),
+                        srid=4326,
+                    ),
+                    "location_purpose": self.validated_data["meta"]["purpose"],
+                    "thumbnail": self.validated_data["thumbnail"],
+                    "preview": self.validated_data["preview"],
+                    "hls": self.validated_data["playback"]["hls"],
+                    "uploaded_at": self.validated_data["readyToStreamAt"],
+                },
+            )
 
 
 class UserRankSerializer(serializers.ModelSerializer):

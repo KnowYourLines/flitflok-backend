@@ -14,5 +14,5 @@ urlpatterns = [
     path(r"video/<uuid:pk>/block/", views.VideoBlockView.as_view()),
     path(r"video/<uuid:pk>/went/", views.VideoWentView.as_view()),
     path(r"video-upload/", views.VideoUploadView.as_view()),
-    path(r"mux-webhook/", views.MuxWebhookView.as_view()),
+    path(r"cloudflare-webhook/", views.CloudflareWebhookView.as_view()),
 ]

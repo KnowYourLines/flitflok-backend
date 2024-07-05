@@ -26,12 +26,13 @@ class Video(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    uploaded_at = models.DateTimeField(null=True)
+    uploaded_at = models.DateTimeField()
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    location = models.PointField(null=True)
-    playback_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
-    asset_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
-    cloudflare_video_id = models.CharField(
+    location = models.PointField()
+    thumbnail = models.URLField()
+    hls = models.URLField()
+    preview = models.URLField()
+    cloudflare_uid = models.CharField(
         max_length=255, blank=True, null=True, unique=True
     )
     reported_by = models.ManyToManyField(User, related_name="reported_videos")

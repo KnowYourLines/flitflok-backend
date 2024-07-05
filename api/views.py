@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models import Video
-from api.permissions import IsFromMux, IsVideoCreator
+from api.permissions import IsFromCloudflare, IsVideoCreator
 from api.serializers import (
     UserSerializer,
     VideoUpdateSerializer,
@@ -29,9 +29,9 @@ from api.serializers import (
 logger = logging.getLogger(__name__)
 
 
-class MuxWebhookView(APIView):
+class CloudflareWebhookView(APIView):
     authentication_classes = []
-    permission_classes = [IsFromMux]
+    permission_classes = [IsFromCloudflare]
 
     def post(self, request):
         serializer = WebhookEventSerializer(
