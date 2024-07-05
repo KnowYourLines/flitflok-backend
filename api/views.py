@@ -8,7 +8,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.models import Video
+from api.models import Video, User
 from api.permissions import IsFromCloudflare
 from api.serializers import (
     UserSerializer,
@@ -76,7 +76,8 @@ class DisplayNameView(APIView):
 
 class RankView(APIView):
     def get(self, request):
-        serializer = UserRankSerializer(request.user)
+        user = User.objects.get(username=request.user.username)
+        serializer = UserRankSerializer(user)
         return Response(serializer.data)
 
 

@@ -44,17 +44,19 @@ class WebhookEventSerializer(serializers.Serializer):
     def save(self):
         ready = self.validated_data["readyToStream"]
         if ready:
-            Video.objects.update_or_create(
+            creator = User.objects.get(
+                username=self.validated_data["meta"]["firebase_uid"]
+            )
+            location = Point(
+                float(self.validated_data["meta"]["longitude"]),
+                float(self.validated_data["meta"]["latitude"]),
+                srid=4326,
+            )
+            video, created = Video.objects.update_or_create(
                 cloudflare_uid=self.validated_data["uid"],
                 defaults={
-                    "creator": User.objects.get(
-                        username=self.validated_data["meta"]["firebase_uid"]
-                    ),
-                    "location": Point(
-                        float(self.validated_data["meta"]["longitude"]),
-                        float(self.validated_data["meta"]["latitude"]),
-                        srid=4326,
-                    ),
+                    "creator": creator,
+                    "location": location,
                     "location_purpose": self.validated_data["meta"]["purpose"],
                     "thumbnail": self.validated_data["thumbnail"],
                     "preview": self.validated_data["preview"],
@@ -62,6 +64,14 @@ class WebhookEventSerializer(serializers.Serializer):
                     "uploaded_at": self.validated_data["readyToStreamAt"],
                 },
             )
+            if (
+                created
+                and not Video.objects.filter(location__distance_lte=(location, D(mi=1)))
+                .exclude(id=video.id)
+                .exists()
+            ):
+                creator.points += 10000
+                creator.save()
 
 
 class UserRankSerializer(serializers.ModelSerializer):
