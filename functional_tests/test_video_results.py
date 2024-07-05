@@ -1,31 +1,120 @@
 import datetime
 import uuid
 from http import HTTPStatus
+from unittest.mock import patch
 
-from freezegun import freeze_time
 from rest_framework.test import APITestCase
 
 from api.models import User, Video
+from api.permissions import IsFromCloudflare
 
 
 class VideoResultsTest(APITestCase):
-    def test_filters_by_location_purpose(self):
+    @patch.object(IsFromCloudflare, "has_permission")
+    def test_filters_by_location_purpose(self, mock_has_permission):
+        mock_has_permission.return_value = True
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
-        video = Video.objects.create(creator=user, playback_id="1")
-        with freeze_time("2012-01-14"):
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.0333876462451904, 51.51291201050047],
-                    },
-                    "location_purpose": "Food & Drink",
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "af95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2012, 1, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
                 },
-                format="json",
-            )
-        Video.objects.create(creator=user, playback_id="2")
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "51.51291201050047",
+                    "longitude": "-0.03338764624519",
+                    "purpose": "Food & Drink",
+                },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
+                },
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "bf95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2012, 1, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
+                },
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "51.51291201050047",
+                    "longitude": "-0.03338764624519",
+                    "purpose": "Shopping",
+                },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
+                },
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
         current_latitude = 51.51291201050047
         current_longitude = -0.0333876462451904
         response = self.client.get(
@@ -37,7 +126,11 @@ class VideoResultsTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(playback_id="1").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
@@ -51,116 +144,221 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "1",
                         "location_purpose": "Food & Drink",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
                     },
                 },
             ],
         }
 
-    def test_omits_videos_without_playback_id(self):
+    @patch.object(IsFromCloudflare, "has_permission")
+    def test_orders_by_distance_creator_points_timestamp(self, mock_has_permission):
+        mock_has_permission.return_value = True
         user = User.objects.create(username="hello world")
-        self.client.force_authenticate(user=user)
-        video = Video.objects.create(creator=user, playback_id="1")
-        with freeze_time("2012-01-14"):
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.0333876462451904, 51.51291201050047],
-                    },
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "af95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2012, 1, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
                 },
-                format="json",
-            )
-        Video.objects.create(creator=user)
-        Video.objects.create(creator=user, playback_id="")
-        current_latitude = 51.51291201050047
-        current_longitude = -0.0333876462451904
-        response = self.client.get(
-            f"/video/?latitude={current_latitude}&longitude={current_longitude}"
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "51.51291201050047",
+                    "longitude": "-0.0333876462451904",
+                    "purpose": "Food & Drink",
+                },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
+                },
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
         )
-        assert response.status_code == HTTPStatus.OK
-        assert response.data == {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "id": str(Video.objects.get(playback_id="1").id),
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [-0.03338764624519, 51.51291201050047],
-                    },
-                    "properties": {
-                        "distance": "0.0 km",
-                        "posted_at": datetime.datetime(
-                            2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
-                        ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
-                        "display_name": None,
-                        "playback_id": "1",
-                        "location_purpose": "",
-                    },
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "bf95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2012, 1, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
                 },
-            ],
-        }
-
-    def test_orders_by_distance_creator_points_timestamp(self):
-        user = User.objects.create(username="hello world")
-        self.client.force_authenticate(user=user)
-        with freeze_time("2012-01-14"):
-            video = Video.objects.create(creator=user, playback_id="1")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.0333876462451904, 51.51291201050047],
-                    },
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "51.491857",
+                    "longitude": "-0.011591",
+                    "purpose": "Food & Drink",
                 },
-                format="json",
-            )
-        with freeze_time("2012-01-14"):
-            video = Video.objects.create(creator=user, playback_id="2")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.011591, 51.491857],
-                    },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
                 },
-                format="json",
-            )
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
         User.objects.create(username="best explorer", points=1000000000000000)
         user2 = User.objects.create(username="goodbye world")
-        self.client.force_authenticate(user=user2)
-        with freeze_time("2023-01-14"):
-            video = Video.objects.create(creator=user2, playback_id="3")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.011591, 51.491857],
-                    },
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "cf95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2023, 1, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
                 },
-                format="json",
-            )
+                "meta": {
+                    "firebase_uid": user2.username,
+                    "latitude": "51.491857",
+                    "longitude": "-0.011591",
+                    "purpose": "Food & Drink",
+                },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
+                },
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
         self.client.force_authenticate(user=user)
-        with freeze_time("2023-01-14"):
-            video = Video.objects.create(creator=user, playback_id="4")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.011591, 51.491857],
-                    },
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "df95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2023, 1, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
                 },
-                format="json",
-            )
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "51.491857",
+                    "longitude": "-0.011591",
+                    "purpose": "Food & Drink",
+                },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
+                },
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
         current_latitude = 51.51291201050047
         current_longitude = -0.0333876462451904
         response = self.client.get(
@@ -170,7 +368,11 @@ class VideoResultsTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(playback_id="1").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
@@ -184,13 +386,18 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 2,
                         "display_name": None,
-                        "playback_id": "1",
-                        "location_purpose": "",
+                        "location_purpose": "Food & Drink",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
                     },
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(playback_id="4").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="df95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -203,13 +410,18 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 2,
                         "display_name": None,
-                        "playback_id": "4",
-                        "location_purpose": "",
+                        "location_purpose": "Food & Drink",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
                     },
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(playback_id="2").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="bf95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -222,13 +434,18 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 2,
                         "display_name": None,
-                        "playback_id": "2",
-                        "location_purpose": "",
+                        "location_purpose": "Food & Drink",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
                     },
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(playback_id="3").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="cf95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -241,42 +458,119 @@ class VideoResultsTest(APITestCase):
                         "creator": "goodbye world",
                         "creator_rank": 3,
                         "display_name": None,
-                        "playback_id": "3",
-                        "location_purpose": "",
+                        "location_purpose": "Food & Drink",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
                     },
                 },
             ],
         }
 
-    def test_finds_next_5_videos(self):
-        with freeze_time("2012-01-14"):
-            user = User.objects.create(username="hello world")
-            self.client.force_authenticate(user=user)
-            video = Video.objects.create(creator=user, playback_id="1")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.0333876462451904, 51.51291201050047],
-                    },
+    @patch.object(IsFromCloudflare, "has_permission")
+    def test_finds_next_5_videos(self, mock_has_permission):
+        mock_has_permission.return_value = True
+        user = User.objects.create(username="hello world")
+        self.client.force_authenticate(user=user)
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "af95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2012, 1, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
                 },
-                format="json",
-            )
-        with freeze_time("2022-01-14"):
-            video = Video.objects.create(creator=user, playback_id="2")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.011591, 51.491857],
-                    },
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "51.51291201050047",
+                    "longitude": "-0.0333876462451904",
                 },
-                format="json",
-            )
-            current_latitude = 51.51291201050047
-            current_longitude = -0.0333876462451904
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
+                },
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "bf95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2022, 1, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
+                },
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "51.491857",
+                    "longitude": "-0.011591",
+                },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
+                },
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
+        current_latitude = 51.51291201050047
+        current_longitude = -0.0333876462451904
         response = self.client.get(
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
         )
@@ -285,7 +579,11 @@ class VideoResultsTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(playback_id="1").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
@@ -299,13 +597,18 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "1",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(playback_id="2").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="bf95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -318,48 +621,160 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "2",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
             ],
         }
-        with freeze_time("2022-01-14"):
-            video = Video.objects.create(creator=user, playback_id="3")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.335827, 53.767750],
-                    },
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "cf95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2022, 1, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
                 },
-                format="json",
-            )
-        with freeze_time("2022-02-14"):
-            video = Video.objects.create(creator=user, playback_id="4")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-3.188267, 55.953251],
-                    },
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "53.767750",
+                    "longitude": "-0.335827",
                 },
-                format="json",
-            )
-        with freeze_time("2022-01-15"):
-            video = Video.objects.create(creator=user, playback_id="5")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.335827, 53.767750],
-                    },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
                 },
-                format="json",
-            )
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "df95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2022, 2, 14, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
+                },
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "55.953251",
+                    "longitude": "-3.188267",
+                },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
+                },
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
+        self.client.post(
+            "/cloudflare-webhook/",
+            data={
+                "uid": "ef95bfce3e887accd1fe9796f741b5f1",
+                "creator": None,
+                "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                "thumbnailTimestampPct": 0,
+                "readyToStream": True,
+                "readyToStreamAt": datetime.datetime(
+                    2022, 1, 15, tzinfo=datetime.timezone.utc
+                ),
+                "status": {
+                    "state": "ready",
+                    "step": "encoding",
+                    "pctComplete": "66.000000",
+                    "errorReasonCode": "",
+                    "errorReasonText": "",
+                },
+                "meta": {
+                    "firebase_uid": user.username,
+                    "latitude": "53.767750",
+                    "longitude": "-0.335827",
+                },
+                "created": "2024-07-05T19:54:00.406659Z",
+                "modified": "2024-07-05T19:54:15.175015Z",
+                "scheduledDeletion": None,
+                "size": 626012,
+                "preview": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+                "allowedOrigins": [],
+                "requireSignedURLs": False,
+                "uploaded": "2024-07-05T19:54:00.406655Z",
+                "uploadExpiry": "2024-07-06T19:53:59Z",
+                "maxSizeBytes": None,
+                "maxDurationSeconds": 30,
+                "duration": 1,
+                "input": {"width": 720, "height": 1280},
+                "playback": {
+                    "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+                    "dash": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.mpd",
+                },
+                "watermark": None,
+                "clippedFrom": None,
+                "publicDetails": None,
+            },
+            headers={
+                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+            },
+            format="json",
+        )
         response = self.client.get(
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
             f"&current_video={response.data['features'][-1]['id']}"
@@ -370,7 +785,11 @@ class VideoResultsTest(APITestCase):
             "features": [
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(playback_id="5").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="ef95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.335827, 53.767750],
@@ -383,12 +802,17 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "5",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
                 {
-                    "id": str(Video.objects.get(playback_id="3").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="cf95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
@@ -402,13 +826,18 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "3",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(playback_id="4").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="df95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-3.188267, 55.953251],
@@ -421,8 +850,9 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "4",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
             ],
@@ -444,7 +874,11 @@ class VideoResultsTest(APITestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "id": str(Video.objects.get(playback_id="1").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
@@ -458,13 +892,18 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "1",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(playback_id="2").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="bf95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.011591, 51.491857],
@@ -477,13 +916,18 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "2",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(playback_id="5").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="ef95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-0.335827, 53.767750],
@@ -496,12 +940,17 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "5",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
                 {
-                    "id": str(Video.objects.get(playback_id="3").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="cf95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "type": "Feature",
                     "geometry": {
                         "type": "Point",
@@ -515,13 +964,18 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "3",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
                 {
                     "type": "Feature",
-                    "id": str(Video.objects.get(playback_id="4").id),
+                    "id": str(
+                        Video.objects.get(
+                            cloudflare_uid="df95bfce3e887accd1fe9796f741b5f1"
+                        ).id
+                    ),
                     "geometry": {
                         "type": "Point",
                         "coordinates": [-3.188267, 55.953251],
@@ -534,8 +988,9 @@ class VideoResultsTest(APITestCase):
                         "creator": "hello world",
                         "creator_rank": 1,
                         "display_name": None,
-                        "playback_id": "4",
                         "location_purpose": "",
+                        "thumbnail": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/thumbnails/thumbnail.jpg",
+                        "hls": "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
                     },
                 },
             ],

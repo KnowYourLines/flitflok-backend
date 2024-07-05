@@ -57,7 +57,7 @@ class WebhookEventSerializer(serializers.Serializer):
                 defaults={
                     "creator": creator,
                     "location": location,
-                    "location_purpose": self.validated_data["meta"]["purpose"],
+                    "location_purpose": self.validated_data["meta"].get("purpose", ""),
                     "thumbnail": self.validated_data["thumbnail"],
                     "preview": self.validated_data["preview"],
                     "hls": self.validated_data["playback"]["hls"],
@@ -248,6 +248,8 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "creator_rank",
             "display_name",
             "location_purpose",
+            "thumbnail",
+            "hls",
         )
 
     def get_posted_at(self, obj):
