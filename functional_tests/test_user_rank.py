@@ -1,8 +1,6 @@
-import datetime
 from http import HTTPStatus
 from unittest.mock import patch
 
-from django.contrib.gis.geos import Point
 from rest_framework.test import APITestCase
 
 from api.models import User
