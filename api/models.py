@@ -32,9 +32,7 @@ class Video(models.Model):
     thumbnail = models.URLField()
     hls = models.URLField()
     preview = models.URLField()
-    cloudflare_uid = models.CharField(
-        max_length=255, blank=True, null=True, unique=True
-    )
+    cloudflare_uid = models.CharField(max_length=255, unique=True)
     reported_by = models.ManyToManyField(User, related_name="reported_videos")
     hidden_from = models.ManyToManyField(User, related_name="hidden_videos")
     directions_requested_by = models.ManyToManyField(

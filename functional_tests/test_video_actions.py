@@ -1,9 +1,10 @@
 import os
+import datetime
 from http import HTTPStatus
 
+from django.contrib.gis.geos import Point
 from django.core import mail
 from django.test.utils import override_settings
-from freezegun import freeze_time
 from rest_framework.test import APITestCase
 
 from api.models import User, Video
@@ -13,18 +14,21 @@ from api.models import User, Video
 class VideoActionsTest(APITestCase):
     def test_counts_unique_video_direction_requests(self):
         user = User.objects.create(username="hello world")
-        video = Video.objects.create(creator=user)
-        self.client.force_authenticate(user=user)
-        self.client.patch(
-            f"/video/{video.id}/",
-            {
-                "location": {
-                    "type": "Point",
-                    "coordinates": [-0.011591, 51.491857],
-                },
-            },
-            format="json",
+        video = Video.objects.create(
+            cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
+            creator=user,
+            hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+            location_purpose="Shopping",
+            location=Point(
+                -0.03338590123538324,
+                51.512863471620285,
+                srid=4326,
+            ),
+            uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
         )
+        self.client.force_authenticate(user=user)
         response = self.client.patch(
             f"/video/{str(video.id)}/went/",
         )
@@ -51,16 +55,19 @@ class VideoActionsTest(APITestCase):
     def test_reports_video(self):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
-        video = Video.objects.create(creator=user, playback_id="1")
-        self.client.patch(
-            f"/video/{video.id}/",
-            {
-                "location": {
-                    "type": "Point",
-                    "coordinates": [-0.0333876462451904, 51.51291201050047],
-                },
-            },
-            format="json",
+        Video.objects.create(
+            cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
+            creator=user,
+            hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+            location_purpose="Shopping",
+            location=Point(
+                -0.03338590123538324,
+                51.512863471620285,
+                srid=4326,
+            ),
+            uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
         )
         current_latitude = 51.51291201050047
         current_longitude = -0.0333876462451904
@@ -100,16 +107,19 @@ class VideoActionsTest(APITestCase):
     def test_hides_video(self):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
-        video = Video.objects.create(creator=user, playback_id="1")
-        self.client.patch(
-            f"/video/{video.id}/",
-            {
-                "location": {
-                    "type": "Point",
-                    "coordinates": [-0.0333876462451904, 51.51291201050047],
-                },
-            },
-            format="json",
+        Video.objects.create(
+            cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
+            creator=user,
+            hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+            location_purpose="Shopping",
+            location=Point(
+                -0.03338590123538324,
+                51.512863471620285,
+                srid=4326,
+            ),
+            uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
         )
         current_latitude = 51.51291201050047
         current_longitude = -0.0333876462451904
@@ -123,7 +133,7 @@ class VideoActionsTest(APITestCase):
         )
         assert response.status_code == HTTPStatus.NO_CONTENT
         assert not response.data
-        reported_video = Video.objects.get(playback_id="1")
+        reported_video = Video.objects.get(id=bad_video_id)
         assert reported_video.hidden_from.all().first() == user
         response = self.client.get(
             f"/video/?latitude={current_latitude}&longitude={current_longitude}"
@@ -142,30 +152,34 @@ class VideoActionsTest(APITestCase):
     def test_blocks_video_user(self):
         bad_user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=bad_user)
-        with freeze_time("2022-01-14"):
-            video = Video.objects.create(creator=bad_user, playback_id="1")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.0333876462451904, 51.51291201050047],
-                    },
-                },
-                format="json",
-            )
-        with freeze_time("2022-01-15"):
-            video = Video.objects.create(creator=bad_user, playback_id="2")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.0333876462451904, 51.51291201050047],
-                    },
-                },
-                format="json",
-            )
+        Video.objects.create(
+            cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
+            creator=bad_user,
+            hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+            location_purpose="Shopping",
+            location=Point(
+                -0.03338590123538324,
+                51.512863471620285,
+                srid=4326,
+            ),
+            uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
+        )
+        Video.objects.create(
+            cloudflare_uid="bf95bfce3e887accd1fe9796f741b5f1",
+            creator=bad_user,
+            hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+            location_purpose="Shopping",
+            location=Point(
+                -0.03338590123538324,
+                51.512863471620285,
+                srid=4326,
+            ),
+            uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 2),
+        )
         current_latitude = 51.51291201050047
         current_longitude = -0.0333876462451904
         user = User.objects.create(username="goodbye world")
@@ -201,30 +215,34 @@ class VideoActionsTest(APITestCase):
     def test_cannot_block_yourself(self):
         user = User.objects.create(username="hello world")
         self.client.force_authenticate(user=user)
-        with freeze_time("2022-01-14"):
-            video = Video.objects.create(creator=user, playback_id="1")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.0333876462451904, 51.51291201050047],
-                    },
-                },
-                format="json",
-            )
-        with freeze_time("2022-01-15"):
-            video = Video.objects.create(creator=user, playback_id="2")
-            self.client.patch(
-                f"/video/{video.id}/",
-                {
-                    "location": {
-                        "type": "Point",
-                        "coordinates": [-0.0333876462451904, 51.51291201050047],
-                    },
-                },
-                format="json",
-            )
+        Video.objects.create(
+            cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
+            creator=user,
+            hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+            location_purpose="Shopping",
+            location=Point(
+                -0.03338590123538324,
+                51.512863471620285,
+                srid=4326,
+            ),
+            uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
+        )
+        Video.objects.create(
+            cloudflare_uid="bf95bfce3e887accd1fe9796f741b5f1",
+            creator=user,
+            hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
+            preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
+            location_purpose="Shopping",
+            location=Point(
+                -0.03338590123538324,
+                51.512863471620285,
+                srid=4326,
+            ),
+            uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 2),
+        )
         current_latitude = 51.51291201050047
         current_longitude = -0.0333876462451904
         response = self.client.get(

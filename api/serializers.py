@@ -237,7 +237,6 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "creator",
             "creator_rank",
             "display_name",
-            "playback_id",
             "location_purpose",
         )
 

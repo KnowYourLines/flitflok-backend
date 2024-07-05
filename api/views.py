@@ -160,8 +160,6 @@ class VideoView(APIView):
             Video.objects.exclude(reported_by=self.request.user)
             .exclude(hidden_from=self.request.user)
             .exclude(creator__in=self.request.user.blocked_users.all())
-            .exclude(playback_id__isnull=True)
-            .exclude(playback_id__exact="")
             .annotate(distance=Distance("location", current_location, spheroid=True))
         )
         if current_video_id := params.validated_data.get("current_video"):
