@@ -1,17 +1,12 @@
 import os
 
-import mux_python
+import requests
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from firebase_admin.auth import delete_user, delete_users
 
 from api.models import Video, User
-
-configuration = mux_python.Configuration()
-configuration.username = os.environ["MUX_TOKEN_ID"]
-configuration.password = os.environ["MUX_TOKEN_SECRET"]
-assets_api = mux_python.AssetsApi(mux_python.ApiClient(configuration))
 
 
 class ReportedVideoListFilter(admin.SimpleListFilter):
@@ -57,16 +52,24 @@ class VideoModelAdmin(admin.ModelAdmin):
         return False
 
     def display_video(self, obj):
-        url = f"https://stream.new/v/{obj.playback_id}"
+        url = f"{obj.preview}"
         return mark_safe("<a href='%s' target='_blank' >View</a>" % url)
 
     def delete_model(self, request, obj):
-        assets_api.delete_asset(obj.asset_id)
+        headers = {
+            "Authorization": f"bearer {os.environ.get('CLOUDFLARE_API_TOKEN')}",
+        }
+        url = f"https://api.cloudflare.com/client/v4/accounts/{os.environ.get('CLOUDFLARE_ACCOUNT_ID')}/stream/{obj.cloudflare_uid}"
+        requests.request("DELETE", url, headers=headers)
         super().delete_model(request, obj)
 
     def delete_queryset(self, request, queryset):
+        headers = {
+            "Authorization": f"bearer {os.environ.get('CLOUDFLARE_API_TOKEN')}",
+        }
         for video in queryset.all():
-            assets_api.delete_asset(video.asset_id)
+            url = f"https://api.cloudflare.com/client/v4/accounts/{os.environ.get('CLOUDFLARE_ACCOUNT_ID')}/stream/{video.cloudflare_uid}"
+            requests.request("DELETE", url, headers=headers)
         super().delete_queryset(request, queryset)
 
     display_video.short_description = "Video"
