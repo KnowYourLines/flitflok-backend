@@ -60,7 +60,7 @@ class WebhookEventSerializer(serializers.Serializer):
                     "location_purpose": self.validated_data["meta"].get("purpose", ""),
                     "thumbnail": self.validated_data["thumbnail"],
                     "preview": self.validated_data["preview"],
-                    "hls": self.validated_data["playback"]["hls"],
+                    "hls": f"{self.validated_data['playback']['hls']}?clientBandwidthHint=1000",
                     "uploaded_at": self.validated_data["readyToStreamAt"],
                 },
             )
