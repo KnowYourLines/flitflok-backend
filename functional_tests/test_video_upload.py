@@ -16,7 +16,7 @@ class VideoUploadTest(APITestCase):
             "/video-upload/",
             headers={
                 "Upload-Length": "1690691",
-                "Upload-Metadata": "name dGVzdA==, purpose dGVzdA==,latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+                "Upload-Metadata": "name dGVzdA==, latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
             },
         )
         assert response.status_code == HTTPStatus.OK

@@ -29,7 +29,6 @@ class CloudflareWebhookTest(APITestCase):
                     "firebase_uid": "0dSkRQUJmuUnf5mdDOUr7bxRP1a2",
                     "latitude": "51.512863471620285",
                     "longitude": "-0.03338590123538324",
-                    "purpose": "Shopping",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -53,7 +52,7 @@ class CloudflareWebhookTest(APITestCase):
                 "publicDetails": None,
             },
             headers={
-                "Webhook-Signature": "time=1720209265,sig1=651cc3328400b51eab2fa94a8ce6a02023493969907ff169bd2cc5ea79781b31"
+                "Webhook-Signature": "time=1720209265,sig1=cc0012604bd13fd2627a92a6ec1295789a1f83f117aba0f83f370b36e6fda2fc"
             },
             format="json",
         )
@@ -72,7 +71,6 @@ class CloudflareWebhookTest(APITestCase):
             == "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch"
         )
         assert video.creator == creator
-        assert video.location_purpose == "Shopping"
         assert video.location == Point(
             -0.03338590123538324,
             51.512863471620285,

@@ -27,9 +27,6 @@ class MetaSerializer(serializers.Serializer):
     firebase_uid = serializers.CharField()
     latitude = serializers.CharField()
     longitude = serializers.CharField()
-    purpose = serializers.ChoiceField(
-        choices=Video.LOCATION_PURPOSE_CHOICES, required=False
-    )
 
 
 class WebhookEventSerializer(serializers.Serializer):
@@ -57,7 +54,6 @@ class WebhookEventSerializer(serializers.Serializer):
                 defaults={
                     "creator": creator,
                     "location": location,
-                    "location_purpose": self.validated_data["meta"].get("purpose", ""),
                     "thumbnail": self.validated_data["thumbnail"],
                     "preview": self.validated_data["preview"],
                     "hls": f"{self.validated_data['playback']['hls']}?clientBandwidthHint=1000",
@@ -220,9 +216,6 @@ class VideoQueryParamSerializer(serializers.Serializer):
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
     current_video = serializers.UUIDField(required=False)
-    purpose = serializers.ChoiceField(
-        required=False, choices=Video.LOCATION_PURPOSE_CHOICES
-    )
 
     def validate_current_video(self, value):
         if not Video.objects.filter(id=value).exists():
@@ -247,7 +240,6 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "creator",
             "creator_rank",
             "display_name",
-            "location_purpose",
             "thumbnail",
             "hls",
         )

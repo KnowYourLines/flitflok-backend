@@ -20,7 +20,6 @@ class VideoActionsTest(APITestCase):
             hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
-            location_purpose="Shopping",
             location=Point(
                 -0.03338590123538324,
                 51.512863471620285,
@@ -61,7 +60,6 @@ class VideoActionsTest(APITestCase):
             hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
-            location_purpose="Shopping",
             location=Point(
                 -0.03338590123538324,
                 51.512863471620285,
@@ -113,7 +111,6 @@ class VideoActionsTest(APITestCase):
             hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
-            location_purpose="Shopping",
             location=Point(
                 -0.03338590123538324,
                 51.512863471620285,
@@ -158,7 +155,6 @@ class VideoActionsTest(APITestCase):
             hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
-            location_purpose="Shopping",
             location=Point(
                 -0.03338590123538324,
                 51.512863471620285,
@@ -172,7 +168,6 @@ class VideoActionsTest(APITestCase):
             hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
-            location_purpose="Shopping",
             location=Point(
                 -0.03338590123538324,
                 51.512863471620285,
@@ -221,7 +216,6 @@ class VideoActionsTest(APITestCase):
             hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
-            location_purpose="Shopping",
             location=Point(
                 -0.03338590123538324,
                 51.512863471620285,
@@ -235,7 +229,6 @@ class VideoActionsTest(APITestCase):
             hls="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             thumbnail="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8",
             preview="https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/watch",
-            location_purpose="Shopping",
             location=Point(
                 -0.03338590123538324,
                 51.512863471620285,
