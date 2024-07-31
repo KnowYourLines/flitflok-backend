@@ -60,7 +60,7 @@ class PointsTest(APITestCase):
             format="json",
         )
         user = User.objects.get(username=user.username)
-        assert user.points == 10000
+        assert user.points == 1000
         self.client.post(
             "/cloudflare-webhook/",
             data={
@@ -110,7 +110,7 @@ class PointsTest(APITestCase):
             format="json",
         )
         user = User.objects.get(username=user.username)
-        assert user.points == 10000
+        assert user.points == 1000
 
     @patch.object(IsFromCloudflare, "has_permission")
     def test_existing_videos_1mi_around_boost_points_for_direction_requests(
@@ -172,7 +172,7 @@ class PointsTest(APITestCase):
             f"/video/{str(video.id)}/went/",
         )
         user = User.objects.get(username=user.username)
-        assert user.points == 10000
+        assert user.points == 1000
         self.client.post(
             "/cloudflare-webhook/",
             data={
@@ -227,7 +227,7 @@ class PointsTest(APITestCase):
             f"/video/{str(video.id)}/went/",
         )
         user = User.objects.get(username=user.username)
-        assert user.points == 10010
+        assert user.points == 1010
         self.client.post(
             "/cloudflare-webhook/",
             data={
@@ -330,4 +330,4 @@ class PointsTest(APITestCase):
             f"/video/{str(video.id)}/went/",
         )
         user = User.objects.get(username=user.username)
-        assert user.points == 10030
+        assert user.points == 1030

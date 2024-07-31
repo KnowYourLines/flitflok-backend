@@ -70,7 +70,7 @@ class WebhookEventSerializer(serializers.Serializer):
                 .exclude(id=video.id)
                 .exists()
             ):
-                creator.points += 10000
+                creator.points += 1000
                 creator.save()
 
 
