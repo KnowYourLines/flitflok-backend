@@ -1,7 +1,13 @@
+import decimal
 import uuid
 
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db import models
+from moneyed import list_all_currencies
+
+CURRENCY_CHOICES = [
+    (str(currency), str(currency)) for currency in list_all_currencies()
+]
 
 
 class User(AbstractUser):
@@ -25,3 +31,17 @@ class Video(models.Model):
     directions_requested_by = models.ManyToManyField(
         User, related_name="directions_requested_videos"
     )
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default="GBP")
+    money_spent = models.DecimalField(
+        max_digits=14, decimal_places=2, default=decimal.Decimal("0.00")
+    )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="currency_valid",
+                check=models.Q(
+                    currency__in=[str(currency) for currency in list_all_currencies()]
+                ),
+            )
+        ]

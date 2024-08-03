@@ -1,3 +1,5 @@
+import decimal
+
 from django.contrib.gis.geos import Point
 from rest_framework.test import APITestCase
 
@@ -29,6 +31,8 @@ class CloudflareWebhookTest(APITestCase):
                     "firebase_uid": "0dSkRQUJmuUnf5mdDOUr7bxRP1a2",
                     "latitude": "51.512863471620285",
                     "longitude": "-0.03338590123538324",
+                    "currency": "GBP",
+                    "money_spent": "5.67",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -52,7 +56,7 @@ class CloudflareWebhookTest(APITestCase):
                 "publicDetails": None,
             },
             headers={
-                "Webhook-Signature": "time=1720209265,sig1=cc0012604bd13fd2627a92a6ec1295789a1f83f117aba0f83f370b36e6fda2fc"
+                "Webhook-Signature": "time=1720209265,sig1=47061f501b1379fa36ff86d5c39e8c5cb489718efd5aca7eb81a04ee4a3edac4"
             },
             format="json",
         )
@@ -77,3 +81,5 @@ class CloudflareWebhookTest(APITestCase):
             srid=4326,
         )
         assert str(video.uploaded_at) == "2024-07-05 19:54:15.176348+00:00"
+        assert video.money_spent == decimal.Decimal("5.67")
+        assert video.currency == "GBP"

@@ -1,5 +1,6 @@
 import base64
 import datetime
+import decimal
 import os
 
 import requests
@@ -12,7 +13,7 @@ from firebase_admin import auth
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
-from api.models import User, Video
+from api.models import User, Video, CURRENCY_CHOICES
 
 
 class PlaybackIdSerializer(serializers.Serializer):
@@ -27,6 +28,10 @@ class MetaSerializer(serializers.Serializer):
     firebase_uid = serializers.CharField()
     latitude = serializers.CharField()
     longitude = serializers.CharField()
+    currency = serializers.ChoiceField(choices=CURRENCY_CHOICES)
+    money_spent = serializers.DecimalField(
+        max_digits=14, decimal_places=2, min_value=decimal.Decimal("0.00")
+    )
 
 
 class WebhookEventSerializer(serializers.Serializer):
@@ -57,6 +62,8 @@ class WebhookEventSerializer(serializers.Serializer):
                     "thumbnail": self.validated_data["thumbnail"],
                     "preview": self.validated_data["preview"],
                     "hls": f"{self.validated_data['playback']['hls']}?clientBandwidthHint=1000",
+                    "money_spent": self.validated_data["meta"]["money_spent"],
+                    "currency": self.validated_data["meta"]["currency"],
                     "uploaded_at": self.validated_data["readyToStreamAt"],
                 },
             )
