@@ -249,6 +249,8 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "display_name",
             "thumbnail",
             "hls",
+            "money_spent",
+            "currency",
         )
 
     def get_posted_at(self, obj):

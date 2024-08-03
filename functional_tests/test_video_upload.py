@@ -56,7 +56,7 @@ class VideoUploadTest(APITestCase):
             "/video-upload/",
             headers={
                 "Upload-Length": "-34534534",
-                "Upload-Metadata": "purpose Rm9vZCAmIERyaW5r,latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+                "Upload-Metadata": "latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
             },
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
