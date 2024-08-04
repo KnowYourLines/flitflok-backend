@@ -64,7 +64,7 @@ class CloudflareWebhookTest(APITestCase):
         video = Video.objects.get(cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1")
         assert (
             video.hls
-            == "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8?clientBandwidthHint=1000"
+            == "https://customer-ar0494u0olvml2w7.cloudflarestream.com/af95bfce3e887accd1fe9796f741b5f1/manifest/video.m3u8?clientBandwidthHint=10"
         )
         assert (
             video.thumbnail
