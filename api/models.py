@@ -15,6 +15,17 @@ class User(AbstractUser):
     blocked_users = models.ManyToManyField("self", blank=True)
     points = models.PositiveBigIntegerField(default=0)
     display_name = models.CharField(max_length=28, null=True, blank=True, unique=True)
+    buddies = models.ManyToManyField("self", blank=True)
+
+
+class BuddyRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sender = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="sent_buddy_requests"
+    )
+    receiver = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="received_buddy_requests"
+    )
 
 
 class Video(models.Model):
