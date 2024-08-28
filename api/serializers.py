@@ -167,6 +167,31 @@ class DisplayNameSerializer(serializers.ModelSerializer):
         fields = ["display_name"]
 
 
+class BuddySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["display_name", "username"]
+
+
+class RemoveBuddySerializer(serializers.Serializer):
+    def update(self, buddy, validated_data):
+        user = self.context["request"].user
+        if not user.buddies.filter(username=buddy).exists():
+            raise serializers.ValidationError("User is not your buddy")
+        user.buddies.remove(buddy)
+        return {}
+
+
+class BlockBuddySerializer(serializers.Serializer):
+    def update(self, buddy, validated_data):
+        user = self.context["request"].user
+        if not user.buddies.filter(username=buddy).exists():
+            raise serializers.ValidationError("User is not your buddy")
+        user.buddies.remove(buddy)
+        user.blocked_users.add(buddy)
+        return {}
+
+
 class VideoUploadSerializer(serializers.Serializer):
     creator = serializers.HiddenField(default=serializers.CurrentUserDefault())
     location = serializers.URLField(read_only=True)

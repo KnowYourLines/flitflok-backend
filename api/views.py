@@ -29,9 +29,40 @@ from api.serializers import (
     BlockBuddyRequestSerializer,
     SentBuddyRequestsSerializer,
     ReceivedBuddyRequestsSerializer,
+    BuddySerializer,
+    RemoveBuddySerializer,
+    BlockBuddySerializer,
 )
 
 logger = logging.getLogger(__name__)
+
+
+class BlockBuddyView(APIView):
+    def patch(self, request, username):
+        buddy = get_object_or_404(User, username=username)
+        serializer = BlockBuddySerializer(
+            buddy, data=request.data, context={"request": self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class RemoveBuddyView(APIView):
+    def patch(self, request, username):
+        buddy = get_object_or_404(User, username=username)
+        serializer = RemoveBuddySerializer(
+            buddy, data=request.data, context={"request": self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class BuddiesView(APIView):
+    def get(self, request):
+        serializer = BuddySerializer(request.user.buddies.all(), many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ReceivedBuddyRequestsView(APIView):

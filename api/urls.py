@@ -20,4 +20,7 @@ urlpatterns = [
     path(r"buddy-request/<uuid:pk>/block/", views.BlockBuddyRequestView.as_view()),
     path(r"sent-buddy-requests/", views.SentBuddyRequestsView.as_view()),
     path(r"received-buddy-requests/", views.ReceivedBuddyRequestsView.as_view()),
+    path(r"buddies/", views.BuddiesView.as_view()),
+    path(r"buddies/<str:username>/remove/", views.RemoveBuddyView.as_view()),
+    path(r"buddies/<str:username>/block/", views.BlockBuddyView.as_view()),
 ]
