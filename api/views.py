@@ -23,9 +23,20 @@ from api.serializers import (
     DisplayNameSerializer,
     VideoUploadSerializer,
     WebhookEventSerializer,
+    BuddyRequestSerializer,
 )
 
 logger = logging.getLogger(__name__)
+
+
+class BuddyRequestView(APIView):
+    def post(self, request):
+        serializer = BuddyRequestSerializer(
+            data=request.data, context={"request": self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class CloudflareWebhookView(APIView):

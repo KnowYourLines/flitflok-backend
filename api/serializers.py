@@ -13,7 +13,41 @@ from firebase_admin import auth
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
-from api.models import User, Video, CURRENCY_CHOICES
+from api.models import User, Video, CURRENCY_CHOICES, BuddyRequest
+
+
+class BuddyRequestSerializer(serializers.Serializer):
+    display_name = serializers.CharField(max_length=28)
+
+    def validate_display_name(self, display_name):
+        if (
+            not User.objects.filter(display_name=display_name).exists()
+            and not User.objects.filter(username=display_name).exists()
+        ):
+            raise serializers.ValidationError("User does not exist")
+        if User.objects.filter(display_name=display_name).exists():
+            receiver = User.objects.get(display_name=display_name)
+        else:
+            receiver = User.objects.get(username=display_name)
+        sender = self.context["request"].user
+        if receiver.blocked_users.filter(username=sender.username).exists():
+            raise serializers.ValidationError("User has blocked you")
+        if BuddyRequest.objects.filter(sender=sender, receiver=receiver).exists():
+            raise serializers.ValidationError("Request already sent")
+        return display_name
+
+    def create(self, validated_data):
+        display_name = validated_data.get("display_name")
+        if User.objects.filter(display_name=display_name).exists():
+            receiver = User.objects.get(display_name=display_name)
+        else:
+            receiver = User.objects.get(username=display_name)
+        sender = self.context["request"].user
+        buddy_request = BuddyRequest.objects.create(
+            sender=sender,
+            receiver=receiver,
+        )
+        return buddy_request
 
 
 class PlaybackIdSerializer(serializers.Serializer):

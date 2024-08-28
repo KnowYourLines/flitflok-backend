@@ -14,4 +14,5 @@ urlpatterns = [
     path(r"video/<uuid:pk>/went/", views.VideoWentView.as_view()),
     path(r"video-upload/", views.VideoUploadView.as_view()),
     path(r"cloudflare-webhook/", views.CloudflareWebhookView.as_view()),
+    path(r"buddy-request/", views.BuddyRequestView.as_view()),
 ]
