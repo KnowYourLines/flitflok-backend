@@ -222,6 +222,8 @@ class VideoUploadSerializer(serializers.Serializer):
 
     def validate(self, data):
         metadata = self.context["request"].headers["Upload-Metadata"]
+        if "starring_firebase_uid" not in metadata:
+            raise serializers.ValidationError("No starring user specified")
         if "maxDurationSeconds" in metadata:
             raise serializers.ValidationError(
                 "Max upload duration cannot be user defined"

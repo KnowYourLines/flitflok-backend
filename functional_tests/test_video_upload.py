@@ -16,7 +16,7 @@ class VideoUploadTest(APITestCase):
             "/video-upload/",
             headers={
                 "Upload-Length": "1690691",
-                "Upload-Metadata": "name dGVzdA==, latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+                "Upload-Metadata": "name dGVzdA==, latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1, starring_firebase_uid LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
             },
         )
         assert response.status_code == HTTPStatus.OK
@@ -56,7 +56,7 @@ class VideoUploadTest(APITestCase):
             "/video-upload/",
             headers={
                 "Upload-Length": "-34534534",
-                "Upload-Metadata": "latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+                "Upload-Metadata": "latitude NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1, starring_firebase_uid LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
             },
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -72,7 +72,7 @@ class VideoUploadTest(APITestCase):
             "/video-upload/",
             headers={
                 "Upload-Length": "34534534",
-                "Upload-Metadata": "maxDurationSeconds NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+                "Upload-Metadata": "maxDurationSeconds NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1, starring_firebase_uid LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
             },
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -88,7 +88,7 @@ class VideoUploadTest(APITestCase):
             "/video-upload/",
             headers={
                 "Upload-Length": "34534534",
-                "Upload-Metadata": "expiry NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+                "Upload-Metadata": "expiry NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1,starring_firebase_uid LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
             },
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -96,3 +96,16 @@ class VideoUploadTest(APITestCase):
             response.data["non_field_errors"][0]
             == "Upload expiry cannot be user defined"
         )
+
+    def test_must_include_starring_user(self):
+        user = User.objects.create(username="zVAvUkRbSbgZCSnZ64hU9PyutCi1")
+        self.client.force_authenticate(user=user)
+        response = self.client.post(
+            "/video-upload/",
+            headers={
+                "Upload-Length": "34534534",
+                "Upload-Metadata": "expiry NTEuNTEyODg4MzI2OTk3Njk=,longitude LTAuMDMzMzg5MTUzNzQwNzMyNjA1",
+            },
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.data["non_field_errors"][0] == "No starring user specified"
