@@ -91,6 +91,7 @@ class PlaybackSerializer(serializers.Serializer):
 
 class MetaSerializer(serializers.Serializer):
     firebase_uid = serializers.CharField()
+    starring_firebase_uid = serializers.CharField()
     latitude = serializers.CharField()
     longitude = serializers.CharField()
     currency = serializers.ChoiceField(choices=CURRENCY_CHOICES)
@@ -114,6 +115,9 @@ class WebhookEventSerializer(serializers.Serializer):
             creator = User.objects.get(
                 username=self.validated_data["meta"]["firebase_uid"]
             )
+            starring = User.objects.get(
+                username=self.validated_data["meta"]["starring_firebase_uid"]
+            )
             location = Point(
                 float(self.validated_data["meta"]["longitude"]),
                 float(self.validated_data["meta"]["latitude"]),
@@ -123,6 +127,7 @@ class WebhookEventSerializer(serializers.Serializer):
                 cloudflare_uid=self.validated_data["uid"],
                 defaults={
                     "creator": creator,
+                    "starring": starring,
                     "location": location,
                     "thumbnail": self.validated_data["thumbnail"],
                     "preview": self.validated_data["preview"],

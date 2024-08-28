@@ -11,6 +11,7 @@ from api.models import User, Video
 class CloudflareWebhookTest(APITestCase):
     def test_creates_new_video(self):
         creator = User.objects.create(username="0dSkRQUJmuUnf5mdDOUr7bxRP1a2")
+        starring = User.objects.create(username="hello world")
         response = self.client.post(
             "/cloudflare-webhook/",
             data={
@@ -29,6 +30,7 @@ class CloudflareWebhookTest(APITestCase):
                 },
                 "meta": {
                     "firebase_uid": "0dSkRQUJmuUnf5mdDOUr7bxRP1a2",
+                    "starring_firebase_uid": "hello world",
                     "latitude": "51.512863471620285",
                     "longitude": "-0.03338590123538324",
                     "currency": "GBP",
@@ -56,7 +58,7 @@ class CloudflareWebhookTest(APITestCase):
                 "publicDetails": None,
             },
             headers={
-                "Webhook-Signature": "time=1720209265,sig1=47061f501b1379fa36ff86d5c39e8c5cb489718efd5aca7eb81a04ee4a3edac4"
+                "Webhook-Signature": "time=1720209265,sig1=4bda2ef941443b7a77de219db12cc49657fb6c67db1b15d80edc32385e73f775"
             },
             format="json",
         )
@@ -83,3 +85,4 @@ class CloudflareWebhookTest(APITestCase):
         assert str(video.uploaded_at) == "2024-07-05 19:54:15.176348+00:00"
         assert video.money_spent == decimal.Decimal("5.67")
         assert video.currency == "GBP"
+        assert video.starring == starring
