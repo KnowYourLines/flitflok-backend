@@ -330,6 +330,15 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
         return num_users_ranked_above + 1
 
 
+class SentBuddyRequestsSerializer(serializers.ModelSerializer):
+    receiver_display_name = serializers.ReadOnlyField(source="receiver.display_name")
+    receiver_username = serializers.ReadOnlyField(source="receiver.username")
+
+    class Meta:
+        model = BuddyRequest
+        fields = ("id", "receiver_display_name", "receiver_username")
+
+
 class VideosBlockedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
