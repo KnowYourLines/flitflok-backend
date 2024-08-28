@@ -8,7 +8,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.models import Video, User
+from api.models import Video, User, BuddyRequest
 from api.permissions import IsFromCloudflare
 from api.serializers import (
     UserSerializer,
@@ -24,6 +24,7 @@ from api.serializers import (
     VideoUploadSerializer,
     WebhookEventSerializer,
     BuddyRequestSerializer,
+    AcceptBuddyRequestSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,17 @@ class BuddyRequestView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
+
+
+class AcceptBuddyRequestView(APIView):
+    def patch(self, request, pk):
+        buddy_request = get_object_or_404(BuddyRequest, pk=pk)
+        serializer = AcceptBuddyRequestSerializer(
+            buddy_request, data=request.data, context={"request": self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_202_ACCEPTED)
 
 
 class CloudflareWebhookView(APIView):

@@ -16,6 +16,18 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from api.models import User, Video, CURRENCY_CHOICES, BuddyRequest
 
 
+class AcceptBuddyRequestSerializer(serializers.Serializer):
+    def update(self, buddy_request, validated_data):
+        if self.context["request"].user != buddy_request.receiver:
+            raise serializers.ValidationError("Only the request receiver can accept")
+        sender = buddy_request.sender
+        receiver = buddy_request.receiver
+        sender.buddies.add(receiver)
+        receiver.buddies.add(sender)
+        buddy_request.delete()
+        return {}
+
+
 class BuddyRequestSerializer(serializers.Serializer):
     display_name = serializers.CharField(max_length=28)
 

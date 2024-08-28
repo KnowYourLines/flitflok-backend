@@ -55,3 +55,26 @@ class BuddyRequestsTest(APITestCase):
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert response.data["display_name"][0] == "User does not exist"
+
+    def test_accepts_request(self):
+        sender = User.objects.create(username="hello")
+        receiver = User.objects.create(username="world", display_name="hello world")
+        buddy_request = BuddyRequest.objects.create(sender=sender, receiver=receiver)
+        self.client.force_authenticate(user=receiver)
+        response = self.client.patch(
+            f"/buddy-request/{buddy_request.id}/accept/",
+        )
+        assert response.status_code == HTTPStatus.ACCEPTED
+        assert sender.buddies.filter(username=receiver.username).exists()
+        assert receiver.buddies.filter(username=sender.username).exists()
+
+    def test_only_receiver_can_accept_request(self):
+        sender = User.objects.create(username="hello")
+        receiver = User.objects.create(username="world", display_name="hello world")
+        buddy_request = BuddyRequest.objects.create(sender=sender, receiver=receiver)
+        self.client.force_authenticate(user=sender)
+        response = self.client.patch(
+            f"/buddy-request/{buddy_request.id}/accept/",
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.data[0] == "Only the request receiver can accept"
