@@ -16,6 +16,14 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from api.models import User, Video, CURRENCY_CHOICES, BuddyRequest
 
 
+class DeclineBuddyRequestSerializer(serializers.Serializer):
+    def update(self, buddy_request, validated_data):
+        if self.context["request"].user != buddy_request.receiver:
+            raise serializers.ValidationError("Only the request receiver can decline")
+        buddy_request.delete()
+        return {}
+
+
 class AcceptBuddyRequestSerializer(serializers.Serializer):
     def update(self, buddy_request, validated_data):
         if self.context["request"].user != buddy_request.receiver:

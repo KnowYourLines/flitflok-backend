@@ -25,6 +25,7 @@ from api.serializers import (
     WebhookEventSerializer,
     BuddyRequestSerializer,
     AcceptBuddyRequestSerializer,
+    DeclineBuddyRequestSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,17 @@ class BuddyRequestView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
+
+
+class DeclineBuddyRequestView(APIView):
+    def delete(self, request, pk):
+        buddy_request = get_object_or_404(BuddyRequest, pk=pk)
+        serializer = DeclineBuddyRequestSerializer(
+            buddy_request, data=request.data, context={"request": self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AcceptBuddyRequestView(APIView):

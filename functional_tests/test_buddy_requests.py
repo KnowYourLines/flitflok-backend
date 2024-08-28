@@ -65,6 +65,7 @@ class BuddyRequestsTest(APITestCase):
             f"/buddy-request/{buddy_request.id}/accept/",
         )
         assert response.status_code == HTTPStatus.ACCEPTED
+        assert not BuddyRequest.objects.all()
         assert sender.buddies.filter(username=receiver.username).exists()
         assert receiver.buddies.filter(username=sender.username).exists()
 
@@ -78,3 +79,25 @@ class BuddyRequestsTest(APITestCase):
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert response.data[0] == "Only the request receiver can accept"
+
+    def test_declines_request(self):
+        sender = User.objects.create(username="hello")
+        receiver = User.objects.create(username="world", display_name="hello world")
+        buddy_request = BuddyRequest.objects.create(sender=sender, receiver=receiver)
+        self.client.force_authenticate(user=receiver)
+        response = self.client.delete(
+            f"/buddy-request/{buddy_request.id}/decline/",
+        )
+        assert response.status_code == HTTPStatus.NO_CONTENT
+        assert not BuddyRequest.objects.all()
+
+    def test_only_receiver_can_decline_request(self):
+        sender = User.objects.create(username="hello")
+        receiver = User.objects.create(username="world", display_name="hello world")
+        buddy_request = BuddyRequest.objects.create(sender=sender, receiver=receiver)
+        self.client.force_authenticate(user=sender)
+        response = self.client.delete(
+            f"/buddy-request/{buddy_request.id}/decline/",
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.data[0] == "Only the request receiver can decline"
