@@ -339,6 +339,15 @@ class SentBuddyRequestsSerializer(serializers.ModelSerializer):
         fields = ("id", "receiver_display_name", "receiver_username")
 
 
+class ReceivedBuddyRequestsSerializer(serializers.ModelSerializer):
+    sender_display_name = serializers.ReadOnlyField(source="sender.display_name")
+    sender_username = serializers.ReadOnlyField(source="sender.username")
+
+    class Meta:
+        model = BuddyRequest
+        fields = ("id", "sender_display_name", "sender_username")
+
+
 class VideosBlockedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video

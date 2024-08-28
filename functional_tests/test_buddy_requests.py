@@ -155,3 +155,26 @@ class BuddyRequestsTest(APITestCase):
         )
         assert response.status_code == HTTPStatus.OK
         assert response.data == []
+
+    def test_retrieves_received_requests(self):
+        sender = User.objects.create(username="hello")
+        receiver = User.objects.create(username="world", display_name="hello world")
+        buddy_request = BuddyRequest.objects.create(sender=sender, receiver=receiver)
+        self.client.force_authenticate(user=receiver)
+        response = self.client.get(
+            f"/received-buddy-requests/",
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.data == [
+            {
+                "id": str(buddy_request.id),
+                "sender_display_name": None,
+                "sender_username": "hello",
+            }
+        ]
+        self.client.force_authenticate(user=sender)
+        response = self.client.get(
+            f"/received-buddy-requests/",
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.data == []

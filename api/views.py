@@ -28,9 +28,18 @@ from api.serializers import (
     DeclineBuddyRequestSerializer,
     BlockBuddyRequestSerializer,
     SentBuddyRequestsSerializer,
+    ReceivedBuddyRequestsSerializer,
 )
 
 logger = logging.getLogger(__name__)
+
+
+class ReceivedBuddyRequestsView(APIView):
+    def get(self, request):
+        serializer = ReceivedBuddyRequestsSerializer(
+            BuddyRequest.objects.filter(receiver=request.user), many=True
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SentBuddyRequestsView(APIView):

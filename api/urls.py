@@ -19,4 +19,5 @@ urlpatterns = [
     path(r"buddy-request/<uuid:pk>/decline/", views.DeclineBuddyRequestView.as_view()),
     path(r"buddy-request/<uuid:pk>/block/", views.BlockBuddyRequestView.as_view()),
     path(r"sent-buddy-requests/", views.SentBuddyRequestsView.as_view()),
+    path(r"received-buddy-requests/", views.ReceivedBuddyRequestsView.as_view()),
 ]
