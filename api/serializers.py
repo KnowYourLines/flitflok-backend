@@ -16,6 +16,17 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from api.models import User, Video, CURRENCY_CHOICES, BuddyRequest
 
 
+class BlockBuddyRequestSerializer(serializers.Serializer):
+    def update(self, buddy_request, validated_data):
+        if self.context["request"].user != buddy_request.receiver:
+            raise serializers.ValidationError("Only the request receiver can block")
+        sender = buddy_request.sender
+        receiver = buddy_request.receiver
+        receiver.blocked_users.add(sender)
+        buddy_request.delete()
+        return {}
+
+
 class DeclineBuddyRequestSerializer(serializers.Serializer):
     def update(self, buddy_request, validated_data):
         if self.context["request"].user != buddy_request.receiver:

@@ -26,6 +26,7 @@ from api.serializers import (
     BuddyRequestSerializer,
     AcceptBuddyRequestSerializer,
     DeclineBuddyRequestSerializer,
+    BlockBuddyRequestSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -39,6 +40,17 @@ class BuddyRequestView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
+
+
+class BlockBuddyRequestView(APIView):
+    def patch(self, request, pk):
+        buddy_request = get_object_or_404(BuddyRequest, pk=pk)
+        serializer = BlockBuddyRequestSerializer(
+            buddy_request, data=request.data, context={"request": self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class DeclineBuddyRequestView(APIView):

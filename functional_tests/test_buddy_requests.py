@@ -101,3 +101,34 @@ class BuddyRequestsTest(APITestCase):
         )
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert response.data[0] == "Only the request receiver can decline"
+
+    def test_blocks_requests(self):
+        sender = User.objects.create(username="hello")
+        receiver = User.objects.create(username="world", display_name="hello world")
+        buddy_request = BuddyRequest.objects.create(sender=sender, receiver=receiver)
+        self.client.force_authenticate(user=receiver)
+        response = self.client.patch(
+            f"/buddy-request/{buddy_request.id}/block/",
+        )
+        assert response.status_code == HTTPStatus.NO_CONTENT
+        assert not BuddyRequest.objects.all()
+        assert receiver.blocked_users.filter(username=sender.username).exists()
+        self.client.force_authenticate(user=sender)
+        response = self.client.post(
+            f"/buddy-request/",
+            data={"display_name": receiver.display_name},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.data["display_name"][0] == "User has blocked you"
+
+    def test_only_receiver_can_block_requests(self):
+        sender = User.objects.create(username="hello")
+        receiver = User.objects.create(username="world", display_name="hello world")
+        buddy_request = BuddyRequest.objects.create(sender=sender, receiver=receiver)
+        self.client.force_authenticate(user=sender)
+        response = self.client.patch(
+            f"/buddy-request/{buddy_request.id}/block/",
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.data[0] == "Only the request receiver can block"
