@@ -10,6 +10,7 @@ class PointsTest(APITestCase):
     @patch.object(IsFromCloudflare, "has_permission")
     def test_points_for_new_video_with_no_videos_1mi_around(self, mock_has_permission):
         mock_has_permission.return_value = True
+        starring_user = User.objects.create(username="hello")
         user = User.objects.create(username="0dSkRQUJmuUnf5mdDOUr7bxRP1a2")
         self.client.post(
             "/cloudflare-webhook/",
@@ -33,6 +34,7 @@ class PointsTest(APITestCase):
                     "longitude": "-0.03338590123538324",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -62,6 +64,8 @@ class PointsTest(APITestCase):
         )
         user = User.objects.get(username=user.username)
         assert user.points == 1000
+        starring_user = User.objects.get(username=starring_user.username)
+        assert starring_user.points == 1000
         self.client.post(
             "/cloudflare-webhook/",
             data={
@@ -113,12 +117,15 @@ class PointsTest(APITestCase):
         )
         user = User.objects.get(username=user.username)
         assert user.points == 1000
+        starring_user = User.objects.get(username=starring_user.username)
+        assert starring_user.points == 1000
 
     @patch.object(IsFromCloudflare, "has_permission")
     def test_existing_videos_1mi_around_boost_points_for_direction_requests(
         self, mock_has_permission
     ):
         mock_has_permission.return_value = True
+        starring_user = User.objects.create(username="hello")
         user = User.objects.create(username="0dSkRQUJmuUnf5mdDOUr7bxRP1a2")
         self.client.force_authenticate(user=user)
         self.client.post(
@@ -143,6 +150,7 @@ class PointsTest(APITestCase):
                     "longitude": "-0.03338590123538324",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -176,6 +184,8 @@ class PointsTest(APITestCase):
         )
         user = User.objects.get(username=user.username)
         assert user.points == 1000
+        starring_user = User.objects.get(username=starring_user.username)
+        assert starring_user.points == 1000
         self.client.post(
             "/cloudflare-webhook/",
             data={
@@ -198,6 +208,7 @@ class PointsTest(APITestCase):
                     "longitude": "-0.03338590123538324",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -232,6 +243,8 @@ class PointsTest(APITestCase):
         )
         user = User.objects.get(username=user.username)
         assert user.points == 1010
+        starring_user = User.objects.get(username=starring_user.username)
+        assert starring_user.points == 1010
         self.client.post(
             "/cloudflare-webhook/",
             data={
@@ -254,6 +267,7 @@ class PointsTest(APITestCase):
                     "longitude": "-0.03338590123538324",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -303,6 +317,7 @@ class PointsTest(APITestCase):
                     "longitude": "-0.03338590123538324",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -337,3 +352,5 @@ class PointsTest(APITestCase):
         )
         user = User.objects.get(username=user.username)
         assert user.points == 1030
+        starring_user = User.objects.get(username=starring_user.username)
+        assert starring_user.points == 1030

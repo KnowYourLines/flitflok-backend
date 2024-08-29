@@ -11,11 +11,15 @@ class UserRankingTest(APITestCase):
     @patch.object(IsFromCloudflare, "has_permission")
     def test_gets_latest_user_ranking(self, mock_has_permission):
         mock_has_permission.return_value = True
+        starring_user = User.objects.create(username="hello")
         user = User.objects.create(username="hello world")
         user2 = User.objects.create(username="0dSkRQUJmuUnf5mdDOUr7bxRP1a2")
         self.client.force_authenticate(user=user)
         response = self.client.get("/rank/")
         assert response.status_code == HTTPStatus.OK
+        assert response.data == {"rank": 1, "points": 0}
+        self.client.force_authenticate(user=starring_user)
+        response = self.client.get("/rank/")
         assert response.data == {"rank": 1, "points": 0}
         self.client.force_authenticate(user=user2)
         response = self.client.get("/rank/")
@@ -38,6 +42,7 @@ class UserRankingTest(APITestCase):
                 },
                 "meta": {
                     "firebase_uid": "0dSkRQUJmuUnf5mdDOUr7bxRP1a2",
+                    "starring_firebase_uid": "hello",
                     "latitude": "51.512863471620285",
                     "longitude": "-0.03338590123538324",
                     "currency": "GBP",
@@ -73,4 +78,7 @@ class UserRankingTest(APITestCase):
         assert response.data == {"rank": 1, "points": 1000}
         self.client.force_authenticate(user=user)
         response = self.client.get("/rank/")
-        assert response.data == {"rank": 2, "points": 0}
+        assert response.data == {"rank": 3, "points": 0}
+        self.client.force_authenticate(user=starring_user)
+        response = self.client.get("/rank/")
+        assert response.data == {"rank": 1, "points": 1000}

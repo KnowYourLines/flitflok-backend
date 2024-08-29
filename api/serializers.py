@@ -143,6 +143,8 @@ class WebhookEventSerializer(serializers.Serializer):
                 .exclude(id=video.id)
                 .exists()
             ):
+                starring.points += 1000
+                starring.save()
                 creator.points += 1000
                 creator.save()
 
@@ -290,6 +292,9 @@ class VideoWentSerializer(serializers.Serializer):
             creator = instance.creator
             creator.points += 10 * num_creators_around
             creator.save()
+            starring = instance.starring
+            starring.points += 10 * num_creators_around
+            starring.save()
         instance.directions_requested_by.add(user)
         instance.save()
         return instance
@@ -330,9 +335,9 @@ class VideoQueryParamSerializer(serializers.Serializer):
 class VideoResultsSerializer(GeoFeatureModelSerializer):
     distance = serializers.SerializerMethodField()
     posted_at = serializers.SerializerMethodField()
-    creator_rank = serializers.SerializerMethodField()
-    creator = serializers.ReadOnlyField(source="creator.username")
-    display_name = serializers.ReadOnlyField(source="creator.display_name")
+    starring_rank = serializers.SerializerMethodField()
+    starring = serializers.ReadOnlyField(source="starring.username")
+    display_name = serializers.ReadOnlyField(source="starring.display_name")
 
     class Meta:
         model = Video
@@ -341,8 +346,8 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
             "id",
             "distance",
             "posted_at",
-            "creator",
-            "creator_rank",
+            "starring",
+            "starring_rank",
             "display_name",
             "thumbnail",
             "hls",
@@ -356,8 +361,8 @@ class VideoResultsSerializer(GeoFeatureModelSerializer):
     def get_distance(self, obj):
         return f"{round(obj.distance.km, 1)} km"
 
-    def get_creator_rank(self, obj):
-        user_points = obj.creator.points
+    def get_starring_rank(self, obj):
+        user_points = obj.starring.points
         num_users_ranked_above = User.objects.filter(points__gt=user_points).count()
         return num_users_ranked_above + 1
 

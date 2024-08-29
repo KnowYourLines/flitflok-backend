@@ -14,6 +14,7 @@ from api.models import User, Video
 class VideoActionsTest(APITestCase):
     def test_counts_unique_video_direction_requests(self):
         user = User.objects.create(username="hello world")
+        starring_user = User.objects.create(username="hello")
         video = Video.objects.create(
             cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
             creator=user,
@@ -25,6 +26,7 @@ class VideoActionsTest(APITestCase):
                 51.512863471620285,
                 srid=4326,
             ),
+            starring=starring_user,
             uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
         )
         self.client.force_authenticate(user=user)
@@ -53,6 +55,7 @@ class VideoActionsTest(APITestCase):
 
     def test_reports_video(self):
         user = User.objects.create(username="hello world")
+        starring_user = User.objects.create(username="hello")
         self.client.force_authenticate(user=user)
         Video.objects.create(
             cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
@@ -65,6 +68,7 @@ class VideoActionsTest(APITestCase):
                 51.512863471620285,
                 srid=4326,
             ),
+            starring=starring_user,
             uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
         )
         current_latitude = 51.51291201050047
@@ -104,6 +108,7 @@ class VideoActionsTest(APITestCase):
 
     def test_hides_video(self):
         user = User.objects.create(username="hello world")
+        starring_user = User.objects.create(username="hello")
         self.client.force_authenticate(user=user)
         Video.objects.create(
             cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
@@ -116,6 +121,7 @@ class VideoActionsTest(APITestCase):
                 51.512863471620285,
                 srid=4326,
             ),
+            starring=starring_user,
             uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
         )
         current_latitude = 51.51291201050047
@@ -148,6 +154,7 @@ class VideoActionsTest(APITestCase):
 
     def test_blocks_video_user(self):
         bad_user = User.objects.create(username="hello world")
+        starring_user = User.objects.create(username="hello")
         self.client.force_authenticate(user=bad_user)
         Video.objects.create(
             cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
@@ -160,6 +167,7 @@ class VideoActionsTest(APITestCase):
                 51.512863471620285,
                 srid=4326,
             ),
+            starring=starring_user,
             uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
         )
         Video.objects.create(
@@ -173,6 +181,7 @@ class VideoActionsTest(APITestCase):
                 51.512863471620285,
                 srid=4326,
             ),
+            starring=starring_user,
             uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 2),
         )
         current_latitude = 51.51291201050047
@@ -209,6 +218,7 @@ class VideoActionsTest(APITestCase):
 
     def test_cannot_block_yourself(self):
         user = User.objects.create(username="hello world")
+        starring_user = User.objects.create(username="hello")
         self.client.force_authenticate(user=user)
         Video.objects.create(
             cloudflare_uid="af95bfce3e887accd1fe9796f741b5f1",
@@ -221,6 +231,7 @@ class VideoActionsTest(APITestCase):
                 51.512863471620285,
                 srid=4326,
             ),
+            starring=starring_user,
             uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 1),
         )
         Video.objects.create(
@@ -234,6 +245,7 @@ class VideoActionsTest(APITestCase):
                 51.512863471620285,
                 srid=4326,
             ),
+            starring=starring_user,
             uploaded_at=datetime.datetime(2024, 1, 1, 1, 1, 2),
         )
         current_latitude = 51.51291201050047

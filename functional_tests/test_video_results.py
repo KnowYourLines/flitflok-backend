@@ -11,9 +11,11 @@ from api.permissions import IsFromCloudflare
 
 class VideoResultsTest(APITestCase):
     @patch.object(IsFromCloudflare, "has_permission")
-    def test_orders_by_distance_creator_points_timestamp(self, mock_has_permission):
+    def test_orders_by_distance_starring_points_timestamp(self, mock_has_permission):
         mock_has_permission.return_value = True
         user = User.objects.create(username="hello world")
+        starring_user = User.objects.create(username="hello")
+        starring_user2 = User.objects.create(username="goodbye")
         self.client.post(
             "/cloudflare-webhook/",
             data={
@@ -34,6 +36,7 @@ class VideoResultsTest(APITestCase):
                 },
                 "meta": {
                     "firebase_uid": user.username,
+                    "starring_firebase_uid": "hello",
                     "latitude": "51.51291201050047",
                     "longitude": "-0.0333876462451904",
                     "currency": "GBP",
@@ -89,6 +92,7 @@ class VideoResultsTest(APITestCase):
                     "longitude": "-0.011591",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -142,6 +146,7 @@ class VideoResultsTest(APITestCase):
                     "longitude": "-0.011591",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "goodbye",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -194,6 +199,7 @@ class VideoResultsTest(APITestCase):
                     "longitude": "-0.011591",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -245,8 +251,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 2,
+                        "starring": "hello",
+                        "starring_rank": 2,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -270,8 +276,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 2,
+                        "starring": "hello",
+                        "starring_rank": 2,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -295,8 +301,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 2,
+                        "starring": "hello",
+                        "starring_rank": 2,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -320,8 +326,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2023, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "goodbye world",
-                        "creator_rank": 3,
+                        "starring": "goodbye",
+                        "starring_rank": 4,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -336,6 +342,7 @@ class VideoResultsTest(APITestCase):
     def test_finds_next_5_videos(self, mock_has_permission):
         mock_has_permission.return_value = True
         user = User.objects.create(username="hello world")
+        starring_user = User.objects.create(username="hello")
         self.client.force_authenticate(user=user)
         self.client.post(
             "/cloudflare-webhook/",
@@ -361,6 +368,7 @@ class VideoResultsTest(APITestCase):
                     "longitude": "-0.0333876462451904",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -412,6 +420,7 @@ class VideoResultsTest(APITestCase):
                     "longitude": "-0.011591",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -464,8 +473,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -489,8 +498,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -524,6 +533,7 @@ class VideoResultsTest(APITestCase):
                     "longitude": "-0.335827",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -575,6 +585,7 @@ class VideoResultsTest(APITestCase):
                     "longitude": "-3.188267",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -626,6 +637,7 @@ class VideoResultsTest(APITestCase):
                     "longitude": "-0.335827",
                     "currency": "GBP",
                     "money_spent": "5.67",
+                    "starring_firebase_uid": "hello",
                 },
                 "created": "2024-07-05T19:54:00.406659Z",
                 "modified": "2024-07-05T19:54:15.175015Z",
@@ -677,8 +689,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -702,8 +714,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -727,8 +739,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -770,8 +782,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2012, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -795,8 +807,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -820,8 +832,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 15, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -845,8 +857,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 1, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
@@ -870,8 +882,8 @@ class VideoResultsTest(APITestCase):
                         "posted_at": datetime.datetime(
                             2022, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
                         ).timestamp(),
-                        "creator": "hello world",
-                        "creator_rank": 1,
+                        "starring": "hello",
+                        "starring_rank": 1,
                         "display_name": None,
                         "currency": "GBP",
                         "money_spent": "5.67",
