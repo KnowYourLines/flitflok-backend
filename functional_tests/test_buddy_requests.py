@@ -43,6 +43,19 @@ class BuddyRequestsTest(APITestCase):
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert response.data["display_name"][0] == "Request already sent"
 
+    def test_cannot_request_if_already_buddies(self):
+        sender = User.objects.create(username="hello")
+        receiver = User.objects.create(username="world", display_name="hello world")
+        sender.buddies.add(receiver)
+        self.client.force_authenticate(user=sender)
+        response = self.client.post(
+            f"/buddy-request/",
+            data={"display_name": receiver.display_name},
+            format="json",
+        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.data["display_name"][0] == "You are already buddies"
+
     def test_receiver_must_exist(self):
         sender = User.objects.create(username="hello")
         receiver = User.objects.create(username="world", display_name="hello world")

@@ -65,6 +65,8 @@ class BuddyRequestSerializer(serializers.Serializer):
             raise serializers.ValidationError("User has blocked you")
         if BuddyRequest.objects.filter(sender=sender, receiver=receiver).exists():
             raise serializers.ValidationError("Request already sent")
+        if sender.buddies.filter(username=receiver.username).exists():
+            raise serializers.ValidationError("You are already buddies")
         return display_name
 
     def create(self, validated_data):
